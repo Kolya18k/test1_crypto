@@ -2,25 +2,43 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>Крипто/Фіат калькулятор</title>
+  <title>Калькулятор обміну</title>
+  <meta name="viewport" content="width=400, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Крипто/Фіат калькулятор</h1>
-    <div class="calc">
-      <div class="currency-row">
-        <select id="from-currency"></select>
-        <input type="number" id="from-amount" value="1" min="0" step="any" />
+  <div class="exchange-card">
+    <h2>Калькулятор обміну</h2>
+    <form id="exchange-form" autocomplete="off">
+      <div class="row">
+        <div class="form-group sum-group">
+          <label for="amount">Сума</label>
+          <input type="number" id="amount" min="0" step="any" required>
+        </div>
+        <div class="form-group currency-group">
+          <label for="fiat">Валюта</label>
+          <div class="select-with-icon">
+            <img id="fiat-icon" src="assets/icons/eur.svg" alt="icon">
+            <select id="fiat">
+              <!-- options inserted by JS -->
+            </select>
+          </div>
+        </div>
       </div>
-      <div class="equals">=</div>
-      <div class="currency-row">
-        <select id="to-currency"></select>
-        <input type="text" id="to-amount" readonly />
+      <div class="form-group">
+        <label for="crypto">Оберіть криптовалюту</label>
+        <div class="select-with-icon">
+          <img id="crypto-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="icon">
+          <select id="crypto">
+            <!-- options inserted by JS -->
+          </select>
+        </div>
       </div>
-    </div>
-    <div id="rate-info"></div>
-    <div id="error-message"></div>
+      <button type="submit" class="submit-btn">Розрахувати</button>
+      <div class="result" id="result"></div>
+      <div class="commission">У курс додано +2% комісії</div>
+      <div class="error" id="error"></div>
+    </form>
   </div>
   <script src="main.js"></script>
 </body>
