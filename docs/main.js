@@ -18,60 +18,68 @@ const cgFiatMap = {
   EUR: 'eur'
 };
 
-function fillChoices(selectId, arr, defaultCode) {
-  const select = document.getElementById(selectId);
-  select.innerHTML = '';
-  arr.forEach(item => {
-    const o = document.createElement('option');
-    o.value = item.code;
-    o.textContent = item.name;
-    o.setAttribute('data-custom-properties', JSON.stringify(item));
-    if (item.code === defaultCode) o.selected = true;
-    select.appendChild(o);
-  });
-  return new Choices(select, {
-    searchEnabled: false,
-    itemSelectText: '',
-    allowHTML: true,
-    placeholder: true,
-    callbackOnCreateTemplates: function(template) {
-      return {
-        item: (classNames, data) => {
-          const props = JSON.parse(data.customProperties);
-          return template(`
-            <div class="${classNames.item} ${classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}"
-              ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
-              <img src="${props.icon}" style="width:26px;height:26px;margin-right:10px;border-radius:50%;vertical-align:middle">
-              <span>${props.name}</span>
-            </div>
-          `);
-        },
-        option: (classNames, data) => {
-          const props = JSON.parse(data.customProperties);
-          return template(`
-            <div class="${classNames.item} ${classNames.itemChoice}" data-select-text="" data-choice
-              ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}"
-              ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
-              <img src="${props.icon}" style="width:26px;height:26px;margin-right:10px;border-radius:50%;vertical-align:middle">
-              <span>${props.name}</span>
-            </div>
-          `);
-        }
-      };
-    }
-  });
-}
+// Universal custom select
+function createCustomSelect(containerId, data, defaultCode) {
+  const cont = document.getElementById(containerId);
+  cont.innerHTML = "";
 
-function getFiat(code) {
-  return fiats.find(c => c.code === code);
-}
-function getCrypto(code) {
-  return cryptos.find(c => c.code === code);
+  let selected = data.find(item => item.code === defaultCode) || data[0];
+
+  const selectedDiv = document.createElement('div');
+  selectedDiv.className = "selected-option";
+  selectedDiv.innerHTML = `<img src="${selected.icon}" alt="">${selected.name}`;
+  cont.appendChild(selectedDiv);
+
+  const optionsList = document.createElement('div');
+  optionsList.className = "options-list";
+  data.forEach(item => {
+    const opt = document.createElement('div');
+    opt.className = "option-item" + (item.code === selected.code ? " active" : "");
+    opt.innerHTML = `<img src="${item.icon}" alt="">${item.name}`;
+    opt.onclick = () => {
+      selected = item;
+      selectedDiv.innerHTML = `<img src="${item.icon}" alt="">${item.name}`;
+      cont.value = item.code;
+      cont.dataset.value = item.code;
+      optionsList.querySelectorAll('.option-item').forEach(x=>x.classList.remove('active'));
+      opt.classList.add('active');
+      cont.classList.remove('open');
+    };
+    optionsList.appendChild(opt);
+  });
+  cont.appendChild(optionsList);
+
+  selectedDiv.onclick = () => {
+    cont.classList.toggle('open');
+  };
+
+  // Click away to close
+  document.addEventListener('click', function(e){
+    if (!cont.contains(e.target)) cont.classList.remove('open');
+  });
+
+  // For form compatibility
+  cont.value = selected.code;
+  cont.dataset.value = selected.code;
+  cont.getValue = () => cont.value;
+  cont.setValue = (code) => {
+    const item = data.find(i=>i.code===code);
+    if (item) {
+      selected = item;
+      selectedDiv.innerHTML = `<img src="${item.icon}" alt="">${item.name}`;
+      cont.value = item.code;
+      cont.dataset.value = item.code;
+      optionsList.querySelectorAll('.option-item').forEach(x=>x.classList.remove('active'));
+      const opt = Array.from(optionsList.children).find(x=>x.textContent===item.name);
+      if (opt) opt.classList.add('active');
+    }
+  };
+  return cont;
 }
 
 async function getExchangeRate(fiatCode, cryptoCode) {
   const fiatId = cgFiatMap[fiatCode];
-  const cryptoObj = getCrypto(cryptoCode);
+  const cryptoObj = cryptos.find(c=>c.code===cryptoCode);
   if (!fiatId || !cryptoObj) return null;
   const url = `https://api.coingecko.com/api/v3/simple/price?ids=${cryptoObj.cg}&vs_currencies=${fiatId}`;
   try {
@@ -84,14 +92,14 @@ async function getExchangeRate(fiatCode, cryptoCode) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const fiatChoices = fillChoices('fiat-currency', fiats, 'EUR');
-  const cryptoChoices = fillChoices('crypto-currency', cryptos, 'BTC');
+  const fiatSelect = createCustomSelect("fiat-select", fiats, "EUR");
+  const cryptoSelect = createCustomSelect("crypto-select", cryptos, "BTC");
 
   document.getElementById('exchange-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     document.getElementById('result-message').textContent = '';
-    const fiat = fiatChoices.getValue(true);
-    const crypto = cryptoChoices.getValue(true);
+    const fiat = fiatSelect.getValue();
+    const crypto = cryptoSelect.getValue();
     let amount = parseFloat(document.getElementById('amount').value);
 
     if (!amount || amount <= 0) {
@@ -111,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let rateWithFee = rate * 1.02;
     let result = amount / rateWithFee;
     document.getElementById('result-message').innerHTML = `
-      <b>${amount} ${getFiat(fiat).name}</b> ≈ <b>${result.toFixed(8)} ${getCrypto(crypto).name}</b>
+      <b>${amount} ${fiats.find(f=>f.code===fiat).name}</b> ≈ <b>${result.toFixed(8)} ${cryptos.find(c=>c.code===crypto).name}</b>
     `;
   });
 });
