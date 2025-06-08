@@ -2,39 +2,40 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=400, initial-scale=1.0">
   <title>Калькулятор обміну</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=340, initial-scale=1.0">
+  <!-- Choices.js styles -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+  <link rel="stylesheet" href="crypto-widget.css">
 </head>
 <body>
   <div class="exchange-widget">
     <h2>Калькулятор обміну</h2>
     <form id="exchange-form" autocomplete="off">
-      <div class="row">
-        <div class="form-group">
-          <label for="fiat-amount">Сума</label>
-          <input type="number" id="fiat-amount" min="0" step="any" value="1000" required>
-        </div>
-        <div class="form-group">
-          <label for="fiat-currency">Валюта</label>
-          <div class="select-with-icon">
-            <img id="fiat-icon" src="assets/icons/eur.svg" alt="" class="currency-icon">
-            <select id="fiat-currency"></select>
-          </div>
-        </div>
+      <div class="form-group">
+        <label for="fiat-amount">Сума</label>
+        <input type="number" id="fiat-amount" min="0" step="any" value="1000" required>
       </div>
       <div class="form-group">
-        <label for="crypto-currency">Oберіть криптовалюту</label>
-        <div class="select-with-icon">
-          <img id="crypto-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="" class="currency-icon">
-          <select id="crypto-currency"></select>
-        </div>
+        <label for="fiat-currency">Валюта</label>
+        <select id="fiat-currency"></select>
+      </div>
+      <div class="swap-row">
+        <button type="button" id="swap-btn" title="Міняти місцями" aria-label="swap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="#0ecb81" viewBox="0 0 24 24"><path d="M7 10v4H3l4 4 4-4H9v-4zm10-8l-4 4h4v4h2V6h4l-4-4z"/></svg>
+        </button>
+      </div>
+      <div class="form-group">
+        <label for="crypto-currency">Криптовалюта</label>
+        <select id="crypto-currency"></select>
       </div>
       <button type="submit" class="btn-green">Розрахувати</button>
+      <div id="result"></div>
+      <div class="note">У курс додано +2% комісії</div>
     </form>
-    <div id="result"></div>
-    <div class="note">У курс додано +2% комісії</div>
   </div>
-  <script src="main.js"></script>
+  <!-- Choices.js script -->
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script src="crypto-widget.js"></script>
 </body>
 </html>
