@@ -1,14 +1,15 @@
-// --- Дані валют ---
-const currencies = [
+const fiats = [
   {code: 'UAH', name: 'Гривня', icon: 'assets/icons/uah.svg'},
   {code: 'USD', name: 'Долар', icon: 'assets/icons/usd.svg'},
-  {code: 'EUR', name: 'Євро', icon: 'assets/icons/eur.svg'},
-  {code: 'BTC', name: 'Bitcoin', icon: 'assets/icons/btc.svg'},
-  {code: 'ETH', name: 'Ethereum', icon: 'assets/icons/eth.svg'},
-  {code: 'USDT', name: 'Tether', icon: 'assets/icons/usdt.svg'},
-  {code: 'BNB', name: 'Binance Coin', icon: 'assets/icons/bnb.svg'},
-  {code: 'SOL', name: 'Solana', icon: 'assets/icons/sol.svg'},
-  {code: 'TON', name: 'Toncoin', icon: 'assets/icons/ton.svg'}
+  {code: 'EUR', name: 'Євро', icon: 'assets/icons/eur.svg'}
+];
+const cryptos = [
+  {code: 'BTC', name: 'Bitcoin (BTC)', icon: 'assets/icons/bitcoin-btc-logo.svg'},
+  {code: 'ETH', name: 'Ethereum (ETH)', icon: 'assets/icons/ethereum-eth-logo.svg'},
+  {code: 'USDT', name: 'Tether (USDT)', icon: 'assets/icons/tether-usdt-logo.svg'},
+  {code: 'BNB', name: 'Binance Coin (BNB)', icon: 'assets/icons/binance-coin-bnb-logo.svg'},
+  {code: 'SOL', name: 'Solana (SOL)', icon: 'assets/icons/solana-sol-logo.svg'},
+  {code: 'TON', name: 'Toncoin (TON)', icon: 'assets/icons/toncoin-ton-logo.svg'}
 ];
 
 const cgMap = {
@@ -23,12 +24,12 @@ const cgMap = {
   TON: 'the-open-network'
 };
 
-let fromChoices, toChoices;
+let fiatChoices, cryptoChoices;
 
-function fillChoices(selectId, currList, defaultCode) {
+function fillChoices(selectId, arr, defaultCode) {
   const select = document.getElementById(selectId);
   select.innerHTML = '';
-  currList.forEach(item => {
+  arr.forEach(item => {
     const o = document.createElement('option');
     o.value = item.code;
     o.textContent = item.name;
@@ -47,8 +48,8 @@ function fillChoices(selectId, currList, defaultCode) {
           const props = JSON.parse(data.customProperties);
           return template(`
             <div class="${classNames.item} ${classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
-              <img src="${props.icon}" style="width:20px;height:20px;margin-right:8px;border-radius:50%;vertical-align:middle">
-              <span>${props.code}</span>
+              <img src="${props.icon}" style="width:26px;height:26px;margin-right:10px;border-radius:50%;vertical-align:middle">
+              <span>${props.name}</span>
             </div>
           `);
         },
@@ -56,8 +57,8 @@ function fillChoices(selectId, currList, defaultCode) {
           const props = JSON.parse(data.customProperties);
           return template(`
             <div class="${classNames.item} ${classNames.itemChoice}" data-select-text="" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
-              <img src="${props.icon}" style="width:20px;height:20px;margin-right:8px;border-radius:50%;vertical-align:middle">
-              <b>${props.code}</b> <span style="color:#aaa;font-size:.97em;">${props.name}</span>
+              <img src="${props.icon}" style="width:26px;height:26px;margin-right:10px;border-radius:50%;vertical-align:middle">
+              <span>${props.name}</span>
             </div>
           `);
         }
@@ -66,8 +67,8 @@ function fillChoices(selectId, currList, defaultCode) {
   });
 }
 
-function getCurrency(code) {
-  return currencies.find(c => c.code === code);
+function getCurrency(arr, code) {
+  return arr.find(c => c.code === code);
 }
 
 async function getExchangeRate(fromCode, toCode) {
@@ -83,92 +84,35 @@ async function getExchangeRate(fromCode, toCode) {
   }
 }
 
-function showRateInfo(rate, from, to) {
-  const rateWithFee = rate * 1.02;
-  document.getElementById('rate-info').innerHTML = `
-    <img src="${getCurrency(from).icon}" style="width:18px;height:18px;vertical-align:middle;border-radius:50%;"> 
-    1 ${from} ≈ <b>${rateWithFee.toFixed(8)} ${to}</b>
-    <img src="${getCurrency(to).icon}" style="width:18px;height:18px;vertical-align:middle;border-radius:50%;"> 
-    <span style="color:#aaa">(з комісією 2%)</span>
-  `;
-}
-
-async function recalc(direction = "from") {
-  const from = fromChoices.getValue(true);
-  const to = toChoices.getValue(true);
-  if (from === to) {
-    document.getElementById('rate-info').textContent = "Валюти повинні бути різними!";
-    document.getElementById('to-amount').value = "";
-    return;
-  }
-  const rate = await getExchangeRate(from, to);
-  if (!rate) {
-    document.getElementById('rate-info').textContent = "Курс не знайдено!";
-    document.getElementById('to-amount').value = "";
-    return;
-  }
-  showRateInfo(rate, from, to);
-  let fromAmount = parseFloat(document.getElementById('from-amount').value);
-  let toAmount = parseFloat(document.getElementById('to-amount').value);
-
-  if (direction === "from" && fromAmount > 0) {
-    let rateWithFee = rate * 1.02;
-    document.getElementById('to-amount').value = (fromAmount / rateWithFee).toFixed(8);
-  } else if (direction === "to" && toAmount > 0) {
-    let rateWithFee = rate * 1.02;
-    document.getElementById('from-amount').value = (toAmount * rateWithFee).toFixed(2);
-  }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-  fromChoices = fillChoices('from-currency', currencies, 'UAH');
-  toChoices = fillChoices('to-currency', currencies, 'BTC');
-  recalc();
-
-  document.getElementById('from-amount').addEventListener('input', () => recalc("from"));
-  document.getElementById('to-amount').addEventListener('input', () => recalc("to"));
-  document.getElementById('from-currency').addEventListener('change', () => recalc("from"));
-  document.getElementById('to-currency').addEventListener('change', () => recalc("from"));
-
-  document.getElementById('swap-btn').addEventListener('click', () => {
-    let from = fromChoices.getValue(true);
-    let to = toChoices.getValue(true);
-
-    fromChoices.setChoiceByValue(to);
-    toChoices.setChoiceByValue(from);
-
-    let fromA = document.getElementById('from-amount').value;
-    let toA = document.getElementById('to-amount').value;
-    document.getElementById('from-amount').value = toA;
-    document.getElementById('to-amount').value = fromA;
-
-    recalc("from");
-  });
-
-  document.getElementById('to-amount').setAttribute('readonly', 'readonly');
+  fiatChoices = fillChoices('fiat-currency', fiats, 'EUR');
+  cryptoChoices = fillChoices('crypto-currency', cryptos, 'BTC');
 
   document.getElementById('exchange-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     document.getElementById('result-message').textContent = '';
-    const from = fromChoices.getValue(true);
-    const to = toChoices.getValue(true);
-    let fromA = parseFloat(document.getElementById('from-amount').value);
-    let toA = parseFloat(document.getElementById('to-amount').value);
+    const fiat = fiatChoices.getValue(true);
+    const crypto = cryptoChoices.getValue(true);
+    let amount = parseFloat(document.getElementById('amount').value);
 
-    if (!fromA || fromA <= 0) {
+    if (!amount || amount <= 0) {
       document.getElementById('result-message').textContent = "Введіть коректну суму для обміну.";
       return;
     }
-    if (from === to) {
-      document.getElementById('result-message').textContent = "Валюти повинні бути різними!";
+    if (fiat === crypto) {
+      document.getElementById('result-message').textContent = "Валюта і криптовалюта мають бути різними!";
       return;
     }
-    if (!toA || toA <= 0) {
-      document.getElementById('result-message').textContent = "Неможливо розрахувати обмін — спробуйте ще раз.";
+
+    const rate = await getExchangeRate(fiat, crypto);
+    if (!rate) {
+      document.getElementById('result-message').textContent = "Курс не знайдено!";
       return;
     }
+    let rateWithFee = rate * 1.02;
+    let result = amount / rateWithFee;
     document.getElementById('result-message').innerHTML = `
-      ✅ <b>${fromA} ${from}</b> → <b>${toA} ${to}</b> — заявка на обмін створена!
+      <b>${amount} ${getCurrency(fiats, fiat).name}</b> ≈ <b>${result.toFixed(8)} ${getCurrency(cryptos, crypto).name}</b>
     `;
   });
 });
