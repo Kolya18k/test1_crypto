@@ -5,8 +5,7 @@ body {
   margin: 0;
   min-height: 100vh;
 }
-
-.exchange-container {
+.exchange-widget {
   background: #23242a;
   border-radius: 32px;
   margin: 48px auto;
@@ -17,7 +16,6 @@ body {
   flex-direction: column;
   align-items: center;
 }
-
 h2 {
   margin-top: 0;
   margin-bottom: 30px;
@@ -26,27 +24,23 @@ h2 {
   font-weight: 700;
   letter-spacing: 1px;
 }
-
 .row {
   display: flex;
   gap: 20px;
   width: 100%;
 }
-
 .form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
   flex: 1;
 }
-
 label {
   margin-bottom: 8px;
   font-size: 1.1em;
   color: #e6e6e6;
   font-weight: 500;
 }
-
 input[type="number"] {
   width: 100%;
   padding: 12px 13px;
@@ -58,11 +52,9 @@ input[type="number"] {
   outline: none;
   transition: border-color .2s;
 }
-
 input[type="number"]:focus {
   border-color: #0ecb81;
 }
-
 .select-with-icon {
   display: flex;
   align-items: center;
@@ -71,7 +63,6 @@ input[type="number"]:focus {
   border-radius: 12px;
   padding: 0 8px;
 }
-
 .currency-icon {
   width: 32px;
   height: 32px;
@@ -81,7 +72,6 @@ input[type="number"]:focus {
   border-radius: 50%;
   display: block;
 }
-
 select {
   background: transparent;
   color: #fff;
@@ -93,7 +83,6 @@ select {
   min-width: 100px;
   cursor: pointer;
 }
-
 .btn-green {
   width: 100%;
   background: #0ecb81;
@@ -108,11 +97,9 @@ select {
   cursor: pointer;
   transition: background .15s;
 }
-
 .btn-green:hover {
   background: #13e08e;
 }
-
 #result {
   margin: 18px 0 2px 0;
   font-size: 1.22em;
@@ -121,7 +108,6 @@ select {
   font-weight: 600;
   min-height: 34px;
 }
-
 .note {
   color: #0ecb81;
   text-align: center;
@@ -129,9 +115,8 @@ select {
   margin-top: 4px;
   opacity: .89;
 }
-
 @media (max-width: 600px) {
-  .exchange-container {
+  .exchange-widget {
     max-width: 98vw;
     padding: 18px 4vw 18px 4vw;
   }
