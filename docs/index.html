@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="exchange-container">
+  <div class="exchange-widget">
     <h2>Калькулятор обміну</h2>
     <form id="exchange-form" autocomplete="off">
       <div class="row">
@@ -19,9 +19,7 @@
           <label for="fiat-currency">Валюта</label>
           <div class="select-with-icon">
             <img id="fiat-icon" src="assets/icons/eur.svg" alt="" class="currency-icon">
-            <select id="fiat-currency">
-              <!-- Валюти додаються через JS -->
-            </select>
+            <select id="fiat-currency"></select>
           </div>
         </div>
       </div>
@@ -29,9 +27,7 @@
         <label for="crypto-currency">Oберіть криптовалюту</label>
         <div class="select-with-icon">
           <img id="crypto-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="" class="currency-icon">
-          <select id="crypto-currency">
-            <!-- Криптовалюти додаються через JS -->
-          </select>
+          <select id="crypto-currency"></select>
         </div>
       </div>
       <button type="submit" class="btn-green">Розрахувати</button>
