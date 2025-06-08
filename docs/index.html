@@ -17,12 +17,23 @@
         </div>
         <div class="input-block">
           <label for="fiat-currency">Валюта</label>
-          <div class="custom-select" id="fiat-select"></div>
+          <select id="fiat-currency">
+            <option value="UAH">Гривня</option>
+            <option value="USD">Долар</option>
+            <option value="EUR">Євро</option>
+          </select>
         </div>
       </div>
       <div class="input-block" style="margin-top:16px;">
         <label for="crypto-currency">Оберіть криптовалюту</label>
-        <div class="custom-select" id="crypto-select"></div>
+        <select id="crypto-currency">
+          <option value="BTC">Bitcoin (BTC)</option>
+          <option value="ETH">Ethereum (ETH)</option>
+          <option value="USDT">Tether (USDT)</option>
+          <option value="BNB">Binance Coin (BNB)</option>
+          <option value="SOL">Solana (SOL)</option>
+          <option value="TON">Toncoin (TON)</option>
+        </select>
       </div>
       <button type="submit" class="calc-btn">Розрахувати</button>
       <div class="result-message" id="result-message"></div>
