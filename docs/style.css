@@ -66,11 +66,6 @@ body {
   border-color: #14c784;
 }
 
-.input-block select {
-  min-width: 124px;
-}
-
-/* Кнопка */
 .calc-btn {
   background: #14c784;
   color: #fff;
@@ -103,31 +98,78 @@ body {
   margin-top: 20px;
 }
 
-/* Choices.js custom */
-.choices__inner, .choices__list--dropdown, .choices__list[role=listbox] {
+/* Custom select */
+.custom-select {
+  position: relative;
+  width: 100%;
+  margin-bottom: 5px;
+}
+.selected-option {
   background: #23242a;
-  color: #fff;
-  border-radius: 10px;
   border: 1.7px solid #303136;
-  font-size: 1.13em;
-}
-.choices__item--selectable {
-  display: flex !important;
+  border-radius: 10px;
+  padding: 11px 14px;
+  display: flex;
   align-items: center;
+  cursor: pointer;
+  font-size: 1.13em;
+  transition: border .2s;
+  font-weight: 600;
 }
-.choices__item--selectable img {
+.selected-option img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
   margin-right: 10px;
 }
-.choices__list--dropdown .choices__item--selectable {
+.selected-option:after {
+  content: "";
+  border: 6px solid transparent;
+  border-top: 7px solid #14c784;
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+.options-list {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  top: 110%;
   background: #23242a;
-  color: #fff;
+  border: 1.7px solid #303136;
+  border-radius: 10px;
+  z-index: 9999;
+  box-shadow: 0 4px 24px 0 #0003;
+  max-height: 210px;
+  overflow-y: auto;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-5px);
+  transition: opacity .15s, transform .2s;
 }
-.choices__list--dropdown .choices__item--selectable.is-highlighted {
-  background: #202020;
+.custom-select.open .options-list {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 11px 14px;
+  cursor: pointer;
+  font-size: 1.13em;
+  transition: background .13s;
+}
+.option-item img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.option-item:hover,
+.option-item.active {
+  background: #191c22;
   color: #14c784;
-}
-.choices__placeholder {
-  color: #aaa !important;
 }
 
 @media (max-width: 600px) {
