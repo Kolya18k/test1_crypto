@@ -1,101 +1,142 @@
 body {
-  background: #23242a;
+  background: #18191e;
   color: #fff;
   font-family: 'Segoe UI', Arial, sans-serif;
   margin: 0;
   min-height: 100vh;
 }
 
-.container {
-  max-width: 420px;
-  margin: 40px auto;
-  padding: 30px 20px;
-  background: #2e2f38;
-  border-radius: 18px;
-  box-shadow: 0 6px 18px #0005;
+.exchange-container {
+  background: #23242a;
+  border-radius: 32px;
+  margin: 48px auto;
+  padding: 38px 32px 26px 32px;
+  max-width: 430px;
+  box-shadow: 0 8px 32px #0004;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-h1 {
-  text-align: center;
-  font-weight: 600;
+h2 {
+  margin-top: 0;
   margin-bottom: 30px;
-  font-size: 1.6em;
+  color: #0ecb81;
+  font-size: 2em;
+  font-weight: 700;
   letter-spacing: 1px;
 }
 
-.calc {
+.row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
+  gap: 20px;
+  width: 100%;
 }
 
-.currency-row {
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+label {
+  margin-bottom: 8px;
+  font-size: 1.1em;
+  color: #e6e6e6;
+  font-weight: 500;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 12px 13px;
+  background: #23242a;
+  border: 1.5px solid #303136;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1.15em;
+  outline: none;
+  transition: border-color .2s;
+}
+
+input[type="number"]:focus {
+  border-color: #0ecb81;
+}
+
+.select-with-icon {
   display: flex;
   align-items: center;
-  gap: 10px;
+  background: #23242a;
+  border: 1.5px solid #303136;
+  border-radius: 12px;
+  padding: 0 8px;
+}
+
+.currency-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-right: 6px;
+  background: none;
+  border-radius: 50%;
+  display: block;
 }
 
 select {
-  min-width: 110px;
-  padding: 5px 8px;
-  border-radius: 8px;
-  border: none;
-  background: #23242a;
+  background: transparent;
   color: #fff;
-  font-size: 1em;
+  font-size: 1.1em;
+  border: none;
   outline: none;
+  padding: 12px 0 12px 0;
+  appearance: none;
+  min-width: 100px;
   cursor: pointer;
 }
 
-input[type="number"], input[type="text"] {
-  width: 110px;
-  padding: 7px 8px;
-  border-radius: 8px;
-  border: none;
-  background: #21222b;
+.btn-green {
+  width: 100%;
+  background: #0ecb81;
   color: #fff;
-  font-size: 1em;
-  outline: none;
-  box-sizing: border-box;
-  text-align: right;
-}
-
-input[type="text"] {
-  background: #23242a;
-}
-
-.equals {
-  font-size: 2em;
+  border: none;
+  border-radius: 14px;
+  padding: 18px 0;
+  font-size: 1.25em;
   font-weight: bold;
-  margin: 0 8px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: background .15s;
 }
 
-.currency-option {
-  display: flex;
-  align-items: center;
-  gap: 7px;
+.btn-green:hover {
+  background: #13e08e;
 }
 
-.currency-option img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-  border-radius: 50%;
-  background: none;
-  /* Ніяких обводок, ніякого зеленого кола! */
-}
-
-#rate-info {
-  margin: 20px 0 0 0;
-  color: #a3ffb7;
-  font-size: 1em;
+#result {
+  margin: 18px 0 2px 0;
+  font-size: 1.22em;
+  color: #fff;
   text-align: center;
+  font-weight: 600;
+  min-height: 34px;
 }
 
-#error-message {
-  margin: 15px 0 0 0;
-  color: #ff6e6e;
-  font-size: 1em;
+.note {
+  color: #0ecb81;
   text-align: center;
+  font-size: 1em;
+  margin-top: 4px;
+  opacity: .89;
+}
+
+@media (max-width: 600px) {
+  .exchange-container {
+    max-width: 98vw;
+    padding: 18px 4vw 18px 4vw;
+  }
+  .row {
+    flex-direction: column;
+    gap: 0;
+  }
 }
