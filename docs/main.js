@@ -4,7 +4,6 @@ const fiatList = [
   { code: 'USD', name: 'Долар', icon: 'assets/icons/usd.svg' },
   { code: 'EUR', name: 'Євро', icon: 'assets/icons/eur.svg' }
 ];
-
 const cryptoList = [
   { code: 'BTC', name: 'Bitcoin', icon: 'assets/icons/bitcoin-btc-logo.svg' },
   { code: 'ETH', name: 'Ethereum', icon: 'assets/icons/ethereum-eth-logo.svg' },
