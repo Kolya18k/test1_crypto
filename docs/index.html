@@ -22,7 +22,7 @@
       padding: 30px;
       border-radius: 20px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-      max-width: 400px;
+      max-width: 420px;
       width: 100%;
     }
     h2 {
@@ -62,6 +62,22 @@
       font-size: 18px;
       text-align: center;
     }
+    .swap {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .swap button {
+      background: none;
+      border: none;
+      font-size: 26px;
+      cursor: pointer;
+      color: #00c86f;
+      transform: rotate(90deg);
+    }
+    .select-icon option {
+      background-color: #2a2d35;
+    }
   </style>
 </head>
 <body>
@@ -72,35 +88,49 @@
       <input type="number" id="amount" placeholder="Введіть суму" />
     </div>
     <div class="form-group">
-      <label for="currency">Валюта</label>
-      <select id="currency">
-        <option value="USD">USD (Долар)</option>
-        <option value="EUR">EUR (Євро)</option>
-        <option value="UAH">UAH (Гривня)</option>
+      <label for="currency">Фіатна валюта</label>
+      <select id="currency" class="select-icon">
+        <option value="USD">🇺🇸 Долар (USD)</option>
+        <option value="EUR">🇪🇺 Євро (EUR)</option>
+        <option value="UAH">🇺🇦 Гривня (UAH)</option>
       </select>
     </div>
+
+    <div class="swap">
+      <button onclick="swapDirection()">⇅</button>
+    </div>
+
     <div class="form-group">
       <label for="crypto">Криптовалюта</label>
-      <select id="crypto">
-        <option value="BTC">Bitcoin (BTC)</option>
-        <option value="ETH">Ethereum (ETH)</option>
-        <option value="USDT">Tether (USDT)</option>
-        <option value="BNB">Binance Coin (BNB)</option>
-        <option value="SOL">Solana (SOL)</option>
+      <select id="crypto" class="select-icon">
+        <option value="BTC">🟠 Bitcoin (BTC)</option>
+        <option value="ETH">🔷 Ethereum (ETH)</option>
+        <option value="USDT">🟢 Tether (USDT)</option>
+        <option value="BNB">🟡 Binance Coin (BNB)</option>
+        <option value="SOL">🟣 Solana (SOL)</option>
       </select>
     </div>
-    <div class="form-group">
-      <label for="direction">Напрям</label>
-      <select id="direction">
-        <option value="fiat-to-crypto">Фіат → Крипто</option>
-        <option value="crypto-to-fiat">Крипто → Фіат</option>
-      </select>
-    </div>
+
     <button onclick="calculate()">Розрахувати</button>
     <div class="result" id="result"></div>
   </div>
-  
+
   <script>
+    let isFiatToCrypto = true;
+
+    function swapDirection() {
+      isFiatToCrypto = !isFiatToCrypto;
+      const label1 = document.querySelector("label[for='currency']");
+      const label2 = document.querySelector("label[for='crypto']");
+      if (isFiatToCrypto) {
+        label1.innerText = "Фіатна валюта";
+        label2.innerText = "Криптовалюта";
+      } else {
+        label1.innerText = "Криптовалюта";
+        label2.innerText = "Фіатна валюта";
+      }
+    }
+
     async function getRate(from, to) {
       const res = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${from}&tsyms=${to}`);
       const data = await res.json();
@@ -111,14 +141,13 @@
       const amount = parseFloat(document.getElementById('amount').value);
       const currency = document.getElementById('currency').value;
       const crypto = document.getElementById('crypto').value;
-      const direction = document.getElementById('direction').value;
 
       if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
       let result;
-      if (direction === 'fiat-to-crypto') {
+      if (isFiatToCrypto) {
         const rate = await getRate(crypto, currency);
-        result = (amount / rate * 0.98).toFixed(6); // 2% комісія
+        result = (amount / rate * 0.98).toFixed(6);
         document.getElementById('result').innerText = `≈ ${result} ${crypto}`;
       } else {
         const rate = await getRate(crypto, currency);
