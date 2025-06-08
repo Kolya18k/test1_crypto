@@ -1,44 +1,39 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400, initial-scale=1.0">
   <title>Калькулятор обміну</title>
-  <meta name="viewport" content="width=500, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="exchange-card">
+  <div class="exchange-widget">
     <h2>Калькулятор обміну</h2>
     <form id="exchange-form" autocomplete="off">
-      <div class="inputs-row">
-        <div class="input-block">
-          <label for="amount">Сума</label>
-          <input type="number" id="amount" min="0" step="any" placeholder="0">
+      <div class="row">
+        <div class="form-group">
+          <label for="fiat-amount">Сума</label>
+          <input type="number" id="fiat-amount" min="0" step="any" value="1000" required>
         </div>
-        <div class="input-block">
+        <div class="form-group">
           <label for="fiat-currency">Валюта</label>
-          <select id="fiat-currency">
-            <option value="UAH">Гривня</option>
-            <option value="USD">Долар</option>
-            <option value="EUR">Євро</option>
-          </select>
+          <div class="select-with-icon">
+            <img id="fiat-icon" src="assets/icons/eur.svg" alt="" class="currency-icon">
+            <select id="fiat-currency"></select>
+          </div>
         </div>
       </div>
-      <div class="input-block" style="margin-top:16px;">
-        <label for="crypto-currency">Оберіть криптовалюту</label>
-        <select id="crypto-currency">
-          <option value="BTC">Bitcoin (BTC)</option>
-          <option value="ETH">Ethereum (ETH)</option>
-          <option value="USDT">Tether (USDT)</option>
-          <option value="BNB">Binance Coin (BNB)</option>
-          <option value="SOL">Solana (SOL)</option>
-          <option value="TON">Toncoin (TON)</option>
-        </select>
+      <div class="form-group">
+        <label for="crypto-currency">Oберіть криптовалюту</label>
+        <div class="select-with-icon">
+          <img id="crypto-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="" class="currency-icon">
+          <select id="crypto-currency"></select>
+        </div>
       </div>
-      <button type="submit" class="calc-btn">Розрахувати</button>
-      <div class="result-message" id="result-message"></div>
+      <button type="submit" class="btn-green">Розрахувати</button>
     </form>
-    <div class="footer-note">У курс додано +2% комісії</div>
+    <div id="result"></div>
+    <div class="note">У курс додано +2% комісії</div>
   </div>
   <script src="main.js"></script>
 </body>
