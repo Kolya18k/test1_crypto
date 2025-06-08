@@ -1,59 +1,63 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Крипто Калькулятор</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор обміну криптовалюти</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
     body {
-      background: #0f172a;
-      color: white;
+      background-color: #0f1115;
       font-family: 'Segoe UI', sans-serif;
+      color: #fff;
       margin: 0;
       padding: 0;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       height: 100vh;
     }
-    .converter-container {
-      background: #1e293b;
-      padding: 40px;
+    .calculator {
+      background: #1a1c22;
+      padding: 30px;
       border-radius: 20px;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 0 20px #00c68f44;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      max-width: 400px;
+      width: 100%;
     }
-    .converter-container h2 {
+    h2 {
+      color: #00c86f;
       text-align: center;
-      color: #00c68f;
       margin-bottom: 20px;
     }
-    .converter-form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
+    .form-group {
+      margin-bottom: 15px;
     }
-    .converter-form input,
-    .converter-form select,
-    .converter-form button {
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 10px;
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    select, input {
+      width: 100%;
+      padding: 10px;
       border: none;
-    }
-    .converter-form button {
-      background: #00c68f;
+      border-radius: 10px;
+      font-size: 16px;
+      background: #2a2d35;
       color: white;
-      font-size: 18px;
+    }
+    button {
+      background: #00c86f;
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      width: 100%;
+      font-size: 16px;
       cursor: pointer;
-      transition: background 0.3s;
     }
-    .converter-form button:hover {
-      background: #02a378;
-    }
-    #result {
+    .result {
       margin-top: 15px;
       font-size: 18px;
       text-align: center;
@@ -61,50 +65,65 @@
   </style>
 </head>
 <body>
-  <section class="converter-container">
+  <div class="calculator">
     <h2>Калькулятор обміну</h2>
-    <div class="converter-form">
-      <input type="number" id="amount" placeholder="Сума у валюті" />
-
-      <select id="fiat">
-        <option value="eur">Євро</option>
-        <option value="usd">Долар</option>
-        <option value="uah">Гривня</option>
-      </select>
-
-      <select id="crypto">
-        <option value="BTC">Bitcoin</option>
-        <option value="ETH">Ethereum</option>
-        <option value="USDT">Tether</option>
-        <option value="BNB">BNB</option>
-        <option value="SOL">Solana</option>
-      </select>
-
-      <button onclick="calculate()">Розрахувати</button>
+    <div class="form-group">
+      <label for="amount">Сума</label>
+      <input type="number" id="amount" placeholder="Введіть суму" />
     </div>
-    <div id="result"></div>
-  </section>
-
+    <div class="form-group">
+      <label for="currency">Валюта</label>
+      <select id="currency">
+        <option value="USD">USD (Долар)</option>
+        <option value="EUR">EUR (Євро)</option>
+        <option value="UAH">UAH (Гривня)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="crypto">Криптовалюта</label>
+      <select id="crypto">
+        <option value="BTC">Bitcoin (BTC)</option>
+        <option value="ETH">Ethereum (ETH)</option>
+        <option value="USDT">Tether (USDT)</option>
+        <option value="BNB">Binance Coin (BNB)</option>
+        <option value="SOL">Solana (SOL)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="direction">Напрям</label>
+      <select id="direction">
+        <option value="fiat-to-crypto">Фіат → Крипто</option>
+        <option value="crypto-to-fiat">Крипто → Фіат</option>
+      </select>
+    </div>
+    <button onclick="calculate()">Розрахувати</button>
+    <div class="result" id="result"></div>
+  </div>
+  
   <script>
+    async function getRate(from, to) {
+      const res = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${from}&tsyms=${to}`);
+      const data = await res.json();
+      return data[to];
+    }
+
     async function calculate() {
-      const fiat = document.getElementById("fiat").value.toUpperCase();
-      const crypto = document.getElementById("crypto").value.toUpperCase();
-      const amount = parseFloat(document.getElementById("amount").value);
+      const amount = parseFloat(document.getElementById('amount').value);
+      const currency = document.getElementById('currency').value;
+      const crypto = document.getElementById('crypto').value;
+      const direction = document.getElementById('direction').value;
 
-      if (!amount || amount <= 0) {
-        document.getElementById("result").innerText = "Введіть коректну суму.";
-        return;
-      }
+      if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
-      try {
-        const response = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${crypto}&tsyms=${fiat}`);
-        const data = await response.json();
-        const rate = data[fiat];
-        const cryptoAmount = (amount / rate) * 0.98;
-        document.getElementById("result").innerText = `≈ ${cryptoAmount.toFixed(6)} ${crypto}`;
-      } catch (error) {
-        document.getElementById("result").innerText = "Помилка отримання курсу.";
-        console.error(error);
+      let result;
+      if (direction === 'fiat-to-crypto') {
+        const rate = await getRate(crypto, currency);
+        result = (amount / rate * 0.98).toFixed(6); // 2% комісія
+        document.getElementById('result').innerText = `≈ ${result} ${crypto}`;
+      } else {
+        const rate = await getRate(crypto, currency);
+        result = (amount * rate * 0.98).toFixed(2);
+        document.getElementById('result').innerText = `≈ ${result} ${currency}`;
       }
     }
   </script>
