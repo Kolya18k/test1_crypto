@@ -1,20 +1,35 @@
-<div class="exchange-calculator">
-  <h2>Калькулятор обміну</h2>
-  <form id="calc-form" autocomplete="off">
-    <div class="form-row">
-      <label for="amount">Сума</label>
-      <input type="number" id="amount" name="amount" min="0" step="any" required placeholder="Введіть суму">
-    </div>
-    <div class="form-row">
-      <label for="fiat-currency">Валюта</label>
-      <select id="fiat-currency" name="fiat-currency" required></select>
-    </div>
-    <div class="form-row">
-      <label for="crypto-currency">Обeрiть криптовалюту</label>
-      <select id="crypto-currency" name="crypto-currency" required></select>
-    </div>
-    <button type="submit" class="btn-primary">Розрахувати</button>
-    <div id="result" class="calc-result"></div>
-  </form>
-  <div class="note">У курс додано +2% комісії</div>
-</div>*
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Крипто-калькулятор</title>
+  <!-- Підключення стилів -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+</head>
+<body>
+  <div class="exchange-calculator">
+    <h2>Калькулятор обміну</h2>
+    <form id="calc-form" autocomplete="off">
+      <div class="form-row">
+        <label for="amount">Сума</label>
+        <input type="number" id="amount" name="amount" min="0" step="any" required placeholder="Введіть суму">
+      </div>
+      <div class="form-row">
+        <label for="fiat-currency">Валюта</label>
+        <select id="fiat-currency" name="fiat-currency" required></select>
+      </div>
+      <div class="form-row">
+        <label for="crypto-currency">Обeрiть криптовалюту</label>
+        <select id="crypto-currency" name="crypto-currency" required></select>
+      </div>
+      <button type="submit" class="btn-primary">Розрахувати</button>
+      <div id="result" class="calc-result"></div>
+    </form>
+    <div class="note">У курс додано +2% комісії</div>
+  </div>
+  <!-- Підключення скриптів -->
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
