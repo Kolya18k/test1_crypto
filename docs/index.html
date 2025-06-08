@@ -5,7 +5,6 @@
   <title>Калькулятор обміну</title>
   <meta name="viewport" content="width=500, initial-scale=1">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 </head>
 <body>
   <div class="exchange-card">
@@ -18,19 +17,18 @@
         </div>
         <div class="input-block">
           <label for="fiat-currency">Валюта</label>
-          <select id="fiat-currency"></select>
+          <div class="custom-select" id="fiat-select"></div>
         </div>
       </div>
       <div class="input-block" style="margin-top:16px;">
         <label for="crypto-currency">Оберіть криптовалюту</label>
-        <select id="crypto-currency"></select>
+        <div class="custom-select" id="crypto-select"></div>
       </div>
       <button type="submit" class="calc-btn">Розрахувати</button>
       <div class="result-message" id="result-message"></div>
     </form>
     <div class="footer-note">У курс додано +2% комісії</div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
