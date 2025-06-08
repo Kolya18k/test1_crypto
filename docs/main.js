@@ -4,27 +4,19 @@ const fiats = [
   {code: 'EUR', name: 'Євро', icon: 'assets/icons/eur.svg'}
 ];
 const cryptos = [
-  {code: 'BTC', name: 'Bitcoin (BTC)', icon: 'assets/icons/bitcoin-btc-logo.svg'},
-  {code: 'ETH', name: 'Ethereum (ETH)', icon: 'assets/icons/ethereum-eth-logo.svg'},
-  {code: 'USDT', name: 'Tether (USDT)', icon: 'assets/icons/tether-usdt-logo.svg'},
-  {code: 'BNB', name: 'Binance Coin (BNB)', icon: 'assets/icons/binance-coin-bnb-logo.svg'},
-  {code: 'SOL', name: 'Solana (SOL)', icon: 'assets/icons/solana-sol-logo.svg'},
-  {code: 'TON', name: 'Toncoin (TON)', icon: 'assets/icons/toncoin-ton-logo.svg'}
+  {code: 'BTC', name: 'Bitcoin (BTC)', icon: 'assets/icons/bitcoin-btc-logo.svg', cg: 'bitcoin'},
+  {code: 'ETH', name: 'Ethereum (ETH)', icon: 'assets/icons/ethereum-eth-logo.svg', cg: 'ethereum'},
+  {code: 'USDT', name: 'Tether (USDT)', icon: 'assets/icons/tether-usdt-logo.svg', cg: 'tether'},
+  {code: 'BNB', name: 'Binance Coin (BNB)', icon: 'assets/icons/binance-coin-bnb-logo.svg', cg: 'binancecoin'},
+  {code: 'SOL', name: 'Solana (SOL)', icon: 'assets/icons/solana-sol-logo.svg', cg: 'solana'},
+  {code: 'TON', name: 'Toncoin (TON)', icon: 'assets/icons/toncoin-ton-logo.svg', cg: 'the-open-network'}
 ];
 
-const cgMap = {
+const cgFiatMap = {
   UAH: 'uah',
   USD: 'usd',
-  EUR: 'eur',
-  BTC: 'bitcoin',
-  ETH: 'ethereum',
-  USDT: 'tether',
-  BNB: 'binancecoin',
-  SOL: 'solana',
-  TON: 'the-open-network'
+  EUR: 'eur'
 };
-
-let fiatChoices, cryptoChoices;
 
 function fillChoices(selectId, arr, defaultCode) {
   const select = document.getElementById(selectId);
@@ -47,7 +39,8 @@ function fillChoices(selectId, arr, defaultCode) {
         item: (classNames, data) => {
           const props = JSON.parse(data.customProperties);
           return template(`
-            <div class="${classNames.item} ${classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
+            <div class="${classNames.item} ${classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}"
+              ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
               <img src="${props.icon}" style="width:26px;height:26px;margin-right:10px;border-radius:50%;vertical-align:middle">
               <span>${props.name}</span>
             </div>
@@ -56,7 +49,9 @@ function fillChoices(selectId, arr, defaultCode) {
         option: (classNames, data) => {
           const props = JSON.parse(data.customProperties);
           return template(`
-            <div class="${classNames.item} ${classNames.itemChoice}" data-select-text="" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
+            <div class="${classNames.item} ${classNames.itemChoice}" data-select-text="" data-choice
+              ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}"
+              ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
               <img src="${props.icon}" style="width:26px;height:26px;margin-right:10px;border-radius:50%;vertical-align:middle">
               <span>${props.name}</span>
             </div>
@@ -67,26 +62,30 @@ function fillChoices(selectId, arr, defaultCode) {
   });
 }
 
-function getCurrency(arr, code) {
-  return arr.find(c => c.code === code);
+function getFiat(code) {
+  return fiats.find(c => c.code === code);
+}
+function getCrypto(code) {
+  return cryptos.find(c => c.code === code);
 }
 
-async function getExchangeRate(fromCode, toCode) {
-  const fromId = cgMap[fromCode], toId = cgMap[toCode];
-  if (!fromId || !toId) return null;
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${fromId}&vs_currencies=${toId}`;
+async function getExchangeRate(fiatCode, cryptoCode) {
+  const fiatId = cgFiatMap[fiatCode];
+  const cryptoObj = getCrypto(cryptoCode);
+  if (!fiatId || !cryptoObj) return null;
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${cryptoObj.cg}&vs_currencies=${fiatId}`;
   try {
     const res = await fetch(url);
     const data = await res.json();
-    return data[fromId][toId];
+    return data[cryptoObj.cg][fiatId];
   } catch (e) {
     return null;
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  fiatChoices = fillChoices('fiat-currency', fiats, 'EUR');
-  cryptoChoices = fillChoices('crypto-currency', cryptos, 'BTC');
+  const fiatChoices = fillChoices('fiat-currency', fiats, 'EUR');
+  const cryptoChoices = fillChoices('crypto-currency', cryptos, 'BTC');
 
   document.getElementById('exchange-form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -112,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let rateWithFee = rate * 1.02;
     let result = amount / rateWithFee;
     document.getElementById('result-message').innerHTML = `
-      <b>${amount} ${getCurrency(fiats, fiat).name}</b> ≈ <b>${result.toFixed(8)} ${getCurrency(cryptos, crypto).name}</b>
+      <b>${amount} ${getFiat(fiat).name}</b> ≈ <b>${result.toFixed(8)} ${getCrypto(crypto).name}</b>
     `;
   });
 });
