@@ -22,7 +22,7 @@
       padding: 30px;
       border-radius: 20px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-      max-width: 420px;
+      max-width: 400px;
       width: 100%;
     }
     h2 {
@@ -46,6 +46,12 @@
       font-size: 16px;
       background: #2a2d35;
       color: white;
+      appearance: none;
+    }
+    .icon-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     button {
       background: #00c86f;
@@ -62,21 +68,26 @@
       font-size: 18px;
       text-align: center;
     }
-    .swap {
+    .swap-btn {
       display: flex;
       justify-content: center;
-      margin: 10px 0;
+      margin-bottom: 15px;
     }
-    .swap button {
-      background: none;
+    .swap-btn button {
+      background: transparent;
       border: none;
-      font-size: 26px;
       cursor: pointer;
+      font-size: 24px;
       color: #00c86f;
-      transform: rotate(90deg);
     }
-    .select-icon option {
-      background-color: #2a2d35;
+    .select-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .select-icon {
+      width: 24px;
+      height: 24px;
     }
   </style>
 </head>
@@ -87,48 +98,67 @@
       <label for="amount">Сума</label>
       <input type="number" id="amount" placeholder="Введіть суму" />
     </div>
-    <div class="form-group">
-      <label for="currency">Фіатна валюта</label>
-      <select id="currency" class="select-icon">
-        <option value="USD">🇺🇸 Долар (USD)</option>
-        <option value="EUR">🇪🇺 Євро (EUR)</option>
-        <option value="UAH">🇺🇦 Гривня (UAH)</option>
-      </select>
+    <div class="form-group" id="first-column">
+      <label for="fiat">Валюта</label>
+      <div class="select-wrapper">
+        <img id="fiat-icon" class="select-icon" src="assets/icons/usd.svg" alt="usd">
+        <select id="fiat">
+          <option value="USD" data-icon="usd.svg">USD (Долар)</option>
+          <option value="EUR" data-icon="eur.svg">EUR (Євро)</option>
+          <option value="UAH" data-icon="uah.svg">UAH (Гривня)</option>
+        </select>
+      </div>
     </div>
-
-    <div class="swap">
-      <button onclick="swapDirection()">⇅</button>
+    <div class="swap-btn">
+      <button onclick="swapFields()">⇅</button>
     </div>
-
-    <div class="form-group">
+    <div class="form-group" id="second-column">
       <label for="crypto">Криптовалюта</label>
-      <select id="crypto" class="select-icon">
-        <option value="BTC">🟠 Bitcoin (BTC)</option>
-        <option value="ETH">🔷 Ethereum (ETH)</option>
-        <option value="USDT">🟢 Tether (USDT)</option>
-        <option value="BNB">🟡 Binance Coin (BNB)</option>
-        <option value="SOL">🟣 Solana (SOL)</option>
-      </select>
+      <div class="select-wrapper">
+        <img id="crypto-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
+        <select id="crypto">
+          <option value="BTC" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
+          <option value="ETH" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
+          <option value="USDT" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
+          <option value="BNB" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
+          <option value="SOL" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
+        </select>
+      </div>
     </div>
-
     <button onclick="calculate()">Розрахувати</button>
     <div class="result" id="result"></div>
   </div>
 
   <script>
-    let isFiatToCrypto = true;
+    const fiatSelect = document.getElementById("fiat");
+    const cryptoSelect = document.getElementById("crypto");
+    const fiatIcon = document.getElementById("fiat-icon");
+    const cryptoIcon = document.getElementById("crypto-icon");
+    const firstColumn = document.getElementById("first-column");
+    const secondColumn = document.getElementById("second-column");
 
-    function swapDirection() {
-      isFiatToCrypto = !isFiatToCrypto;
-      const label1 = document.querySelector("label[for='currency']");
-      const label2 = document.querySelector("label[for='crypto']");
-      if (isFiatToCrypto) {
-        label1.innerText = "Фіатна валюта";
-        label2.innerText = "Криптовалюта";
-      } else {
-        label1.innerText = "Криптовалюта";
-        label2.innerText = "Фіатна валюта";
-      }
+    fiatSelect.addEventListener("change", () => {
+      fiatIcon.src = `assets/icons/${fiatSelect.options[fiatSelect.selectedIndex].dataset.icon}`;
+    });
+
+    cryptoSelect.addEventListener("change", () => {
+      cryptoIcon.src = `assets/icons/${cryptoSelect.options[cryptoSelect.selectedIndex].dataset.icon}`;
+    });
+
+    let isFiatFirst = true;
+
+    function swapFields() {
+      isFiatFirst = !isFiatFirst;
+      const first = firstColumn.innerHTML;
+      const second = secondColumn.innerHTML;
+      firstColumn.innerHTML = second;
+      secondColumn.innerHTML = first;
+      document.getElementById("fiat").addEventListener("change", () => {
+        document.getElementById("fiat-icon").src = `assets/icons/${document.getElementById("fiat").options[document.getElementById("fiat").selectedIndex].dataset.icon}`;
+      });
+      document.getElementById("crypto").addEventListener("change", () => {
+        document.getElementById("crypto-icon").src = `assets/icons/${document.getElementById("crypto").options[document.getElementById("crypto").selectedIndex].dataset.icon}`;
+      });
     }
 
     async function getRate(from, to) {
@@ -139,21 +169,17 @@
 
     async function calculate() {
       const amount = parseFloat(document.getElementById('amount').value);
-      const currency = document.getElementById('currency').value;
-      const crypto = document.getElementById('crypto').value;
+      const from = isFiatFirst ? document.getElementById("fiat").value : document.getElementById("crypto").value;
+      const to = isFiatFirst ? document.getElementById("crypto").value : document.getElementById("fiat").value;
 
       if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
-      let result;
-      if (isFiatToCrypto) {
-        const rate = await getRate(crypto, currency);
-        result = (amount / rate * 0.98).toFixed(6);
-        document.getElementById('result').innerText = `≈ ${result} ${crypto}`;
-      } else {
-        const rate = await getRate(crypto, currency);
-        result = (amount * rate * 0.98).toFixed(2);
-        document.getElementById('result').innerText = `≈ ${result} ${currency}`;
-      }
+      const rate = await getRate(from, to);
+      const result = isFiatFirst
+        ? (amount / rate * 0.98).toFixed(6)
+        : (amount * rate * 0.98).toFixed(2);
+
+      document.getElementById("result").innerText = `≈ ${result} ${to}`;
     }
   </script>
 </body>
