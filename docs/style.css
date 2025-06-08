@@ -1,1 +1,101 @@
+body {
+  background: #23242a;
+  color: #fff;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+}
 
+.container {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 30px 20px;
+  background: #2e2f38;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px #0005;
+}
+
+h1 {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 30px;
+  font-size: 1.6em;
+  letter-spacing: 1px;
+}
+
+.calc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.currency-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+select {
+  min-width: 110px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: none;
+  background: #23242a;
+  color: #fff;
+  font-size: 1em;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="number"], input[type="text"] {
+  width: 110px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  border: none;
+  background: #21222b;
+  color: #fff;
+  font-size: 1em;
+  outline: none;
+  box-sizing: border-box;
+  text-align: right;
+}
+
+input[type="text"] {
+  background: #23242a;
+}
+
+.equals {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0 8px;
+}
+
+.currency-option {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.currency-option img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: none;
+  /* Ніяких обводок, ніякого зеленого кола! */
+}
+
+#rate-info {
+  margin: 20px 0 0 0;
+  color: #a3ffb7;
+  font-size: 1em;
+  text-align: center;
+}
+
+#error-message {
+  margin: 15px 0 0 0;
+  color: #ff6e6e;
+  font-size: 1em;
+  text-align: center;
+}
