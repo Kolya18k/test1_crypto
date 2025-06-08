@@ -2,39 +2,111 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=400, initial-scale=1.0">
-  <title>Калькулятор обміну</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Крипто Калькулятор</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .converter-container {
+      background: #1e293b;
+      padding: 40px;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 0 20px #00c68f44;
+    }
+    .converter-container h2 {
+      text-align: center;
+      color: #00c68f;
+      margin-bottom: 20px;
+    }
+    .converter-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .converter-form input,
+    .converter-form select,
+    .converter-form button {
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+    }
+    .converter-form button {
+      background: #00c68f;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .converter-form button:hover {
+      background: #02a378;
+    }
+    #result {
+      margin-top: 15px;
+      font-size: 18px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <div class="exchange-widget">
+  <section class="converter-container">
     <h2>Калькулятор обміну</h2>
-    <form id="exchange-form" autocomplete="off">
-      <div class="row">
-        <div class="form-group">
-          <label for="fiat-amount">Сума</label>
-          <input type="number" id="fiat-amount" min="0" step="any" value="1000" required>
-        </div>
-        <div class="form-group">
-          <label for="fiat-currency">Валюта</label>
-          <div class="select-with-icon">
-            <img id="fiat-icon" src="assets/icons/eur.svg" alt="" class="currency-icon">
-            <select id="fiat-currency"></select>
-          </div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="crypto-currency">Oберіть криптовалюту</label>
-        <div class="select-with-icon">
-          <img id="crypto-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="" class="currency-icon">
-          <select id="crypto-currency"></select>
-        </div>
-      </div>
-      <button type="submit" class="btn-green">Розрахувати</button>
-    </form>
+    <div class="converter-form">
+      <input type="number" id="amount" placeholder="Сума у валюті" />
+
+      <select id="fiat">
+        <option value="eur">Євро</option>
+        <option value="usd">Долар</option>
+        <option value="uah">Гривня</option>
+      </select>
+
+      <select id="crypto">
+        <option value="BTC">Bitcoin</option>
+        <option value="ETH">Ethereum</option>
+        <option value="USDT">Tether</option>
+        <option value="BNB">BNB</option>
+        <option value="SOL">Solana</option>
+      </select>
+
+      <button onclick="calculate()">Розрахувати</button>
+    </div>
     <div id="result"></div>
-    <div class="note">У курс додано +2% комісії</div>
-  </div>
-  <script src="main.js"></script>
+  </section>
+
+  <script>
+    async function calculate() {
+      const fiat = document.getElementById("fiat").value.toUpperCase();
+      const crypto = document.getElementById("crypto").value.toUpperCase();
+      const amount = parseFloat(document.getElementById("amount").value);
+
+      if (!amount || amount <= 0) {
+        document.getElementById("result").innerText = "Введіть коректну суму.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${crypto}&tsyms=${fiat}`);
+        const data = await response.json();
+        const rate = data[fiat];
+        const cryptoAmount = (amount / rate) * 0.98;
+        document.getElementById("result").innerText = `≈ ${cryptoAmount.toFixed(6)} ${crypto}`;
+      } catch (error) {
+        document.getElementById("result").innerText = "Помилка отримання курсу.";
+        console.error(error);
+      }
+    }
+  </script>
 </body>
 </html>
