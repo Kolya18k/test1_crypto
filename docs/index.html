@@ -1,1 +1,27 @@
-
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Крипто/Фіат калькулятор</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Крипто/Фіат калькулятор</h1>
+    <div class="calc">
+      <div class="currency-row">
+        <select id="from-currency"></select>
+        <input type="number" id="from-amount" value="1" min="0" step="any" />
+      </div>
+      <div class="equals">=</div>
+      <div class="currency-row">
+        <select id="to-currency"></select>
+        <input type="text" id="to-amount" readonly />
+      </div>
+    </div>
+    <div id="rate-info"></div>
+    <div id="error-message"></div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
