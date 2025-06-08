@@ -2,31 +2,35 @@
 <html lang="uk">
 <head>
   <meta charset="utf-8">
-  <title>CryptoCalc</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Калькулятор обміну</title>
+  <meta name="viewport" content="width=500, initial-scale=1">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 </head>
 <body>
-  <div class="cryptocalc-card">
+  <div class="exchange-card">
     <h2>Калькулятор обміну</h2>
-    <input type="number" id="amount" placeholder="Сума">
-    <select id="fiat">
-      <option value="usd">Долар (USD)</option>
-      <option value="eur">Євро (EUR)</option>
-      <option value="uah">Гривня (UAH)</option>
-    </select>
-    <select id="crypto">
-      <option value="bitcoin">Bitcoin (BTC)</option>
-      <option value="ethereum">Ethereum (ETH)</option>
-      <option value="tether">Tether (USDT)</option>
-      <option value="binancecoin">Binance Coin (BNB)</option>
-      <option value="solana">Solana (SOL)</option>
-      <option value="the-open-network">Toncoin (TON)</option>
-    </select>
-    <button onclick="calc()">Розрахувати</button>
-    <div id="result"></div>
-    <div class="note">У курс додано +2% комісії</div>
+    <form id="exchange-form" autocomplete="off">
+      <div class="inputs-row">
+        <div class="input-block">
+          <label for="amount">Сума</label>
+          <input type="number" id="amount" min="0" step="any" placeholder="0">
+        </div>
+        <div class="input-block">
+          <label for="fiat-currency">Валюта</label>
+          <select id="fiat-currency"></select>
+        </div>
+      </div>
+      <div class="input-block" style="margin-top:16px;">
+        <label for="crypto-currency">Оберіть криптовалюту</label>
+        <select id="crypto-currency"></select>
+      </div>
+      <button type="submit" class="calc-btn">Розрахувати</button>
+      <div class="result-message" id="result-message"></div>
+    </form>
+    <div class="footer-note">У курс додано +2% комісії</div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
