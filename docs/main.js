@@ -1,105 +1,16 @@
 // --- Дані валют ---
-const fiatList = [
-  { code: 'UAH', name: 'Гривня', icon: 'assets/icons/uah.svg' },
-  { code: 'USD', name: 'Долар', icon: 'assets/icons/usd.svg' },
-  { code: 'EUR', name: 'Євро', icon: 'assets/icons/eur.svg' }
-];
-const cryptoList = [
-  { code: 'BTC', name: 'Bitcoin', icon: 'assets/icons/btc.svg' },
-  { code: 'ETH', name: 'Ethereum', icon: 'assets/icons/eth.svg' },
-  { code: 'USDT', name: 'Tether', icon: 'assets/icons/usdt.svg' },
-  { code: 'BNB', name: 'Binance Coin', icon: 'assets/icons/bnb.svg' },
-  { code: 'SOL', name: 'Solana', icon: 'assets/icons/sol.svg' },
-  { code: 'TON', name: 'Toncoin', icon: 'assets/icons/ton.svg' }
+const currencies = [
+  {code: 'UAH', name: 'Гривня', icon: 'assets/icons/uah.svg', type: 'fiat'},
+  {code: 'USD', name: 'Долар США', icon: 'assets/icons/usd.svg', type: 'fiat'},
+  {code: 'EUR', name: 'Євро', icon: 'assets/icons/eur.svg', type: 'fiat'},
+  {code: 'BTC', name: 'Bitcoin', icon: 'assets/icons/btc.svg', type: 'crypto'},
+  {code: 'ETH', name: 'Ethereum', icon: 'assets/icons/eth.svg', type: 'crypto'},
+  {code: 'USDT', name: 'Tether', icon: 'assets/icons/usdt.svg', type: 'crypto'},
+  {code: 'BNB', name: 'Binance Coin', icon: 'assets/icons/bnb.svg', type: 'crypto'},
+  {code: 'SOL', name: 'Solana', icon: 'assets/icons/sol.svg', type: 'crypto'},
+  {code: 'TON', name: 'Toncoin', icon: 'assets/icons/ton.svg', type: 'crypto'}
 ];
 
-let fiatChoices, cryptoChoices;
-
-function createChoices(selectId, list, defaultValue) {
-  const select = document.getElementById(selectId);
-  select.innerHTML = '';
-  list.forEach(item => {
-    const o = document.createElement('option');
-    o.value = item.code;
-    o.textContent = item.name;
-    o.setAttribute('data-custom-properties', JSON.stringify(item));
-    if (item.code === defaultValue) o.selected = true;
-    select.appendChild(o);
-  });
-  return new Choices(select, {
-    searchEnabled: false,
-    itemSelectText: '',
-    allowHTML: true,
-    callbackOnCreateTemplates: function(template) {
-      return {
-        item: (classNames, data) => {
-          const props = JSON.parse(data.customProperties);
-          return template(`
-            <div class="${classNames.item} ${classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
-              <img src="${props.icon}" style="width:20px;height:20px;margin-right:8px;border-radius:50%;vertical-align:middle">
-              ${props.name}<span style="color:#aaa;font-size:.97em;"> (${props.code})</span>
-            </div>
-          `);
-        },
-        option: (classNames, data) => {
-          const props = JSON.parse(data.customProperties);
-          return template(`
-            <div class="${classNames.item} ${classNames.itemChoice}" data-select-text="" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
-              <img src="${props.icon}" style="width:20px;height:20px;margin-right:8px;border-radius:50%;vertical-align:middle">
-              ${props.name}<span style="color:#aaa;font-size:.97em;"> (${props.code})</span>
-            </div>
-          `);
-        }
-      };
-    }
-  });
-}
-
-function getListByType(type) {
-  return type === 'fiat' ? fiatList : cryptoList;
-}
-function getChoicesByType(type) {
-  return type === 'fiat' ? fiatChoices : cryptoChoices;
-}
-function setChoicesByType(type, choices) {
-  if (type === 'fiat') fiatChoices = choices;
-  else cryptoChoices = choices;
-}
-function getOppositeType(type) {
-  return type === 'fiat' ? 'crypto' : 'fiat';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  fiatChoices = createChoices('fiat-currency', fiatList, 'UAH');
-  cryptoChoices = createChoices('crypto-currency', cryptoList, 'BTC');
-
-  // Свап
-  document.getElementById('swap-btn').addEventListener('click', function() {
-    // Беремо поточні значення
-    const fiatValue = fiatChoices.getValue(true);
-    const cryptoValue = cryptoChoices.getValue(true);
-
-    // Міняємо місцями select-и
-    // Для swap: якщо вибрали, наприклад, ETH в крипті і USD у фіаті, то ETH стане фіатом, USD криптою
-    const fiatObj = fiatList.find(f => f.code === fiatValue);
-    const cryptoObj = cryptoList.find(c => c.code === cryptoValue);
-
-    // Якщо хтось вибирає не-крипту у другому полі — не міняємо!
-    if (!cryptoObj || !fiatObj) return;
-
-    // Оновлюємо списки
-    fiatChoices.destroy();
-    cryptoChoices.destroy();
-    fiatChoices = createChoices('fiat-currency', [ ...fiatList, ...cryptoList ], cryptoValue);
-    cryptoChoices = createChoices('crypto-currency', [ ...fiatList, ...cryptoList ], fiatValue);
-  });
-});
-
-// --- Логіка калькулятора ---
-const calcForm = document.getElementById('calc-form');
-const resultDiv = document.getElementById('result');
-
-// Для Coingecko — map кодів у id
 const cgMap = {
   UAH: 'uah',
   USD: 'usd',
@@ -112,11 +23,56 @@ const cgMap = {
   TON: 'the-open-network'
 };
 
-async function getExchangeRate(from, to) {
-  const fromId = cgMap[from], toId = cgMap[to];
+let fromChoices, toChoices;
+
+function fillChoices(selectId, currList, defaultCode) {
+  const select = document.getElementById(selectId);
+  select.innerHTML = '';
+  currList.forEach(item => {
+    const o = document.createElement('option');
+    o.value = item.code;
+    o.textContent = item.name;
+    o.setAttribute('data-custom-properties', JSON.stringify(item));
+    if (item.code === defaultCode) o.selected = true;
+    select.appendChild(o);
+  });
+  return new Choices(select, {
+    searchEnabled: false,
+    itemSelectText: '',
+    allowHTML: true,
+    placeholder: true,
+    callbackOnCreateTemplates: function(template) {
+      return {
+        item: (classNames, data) => {
+          const props = JSON.parse(data.customProperties);
+          return template(`
+            <div class="${classNames.item} ${classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
+              <img src="${props.icon}" style="width:20px;height:20px;margin-right:8px;border-radius:50%;vertical-align:middle">
+              ${props.code}
+            </div>
+          `);
+        },
+        option: (classNames, data) => {
+          const props = JSON.parse(data.customProperties);
+          return template(`
+            <div class="${classNames.item} ${classNames.itemChoice}" data-select-text="" data-choice ${data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable'} data-id="${data.id}" data-value="${data.value}" ${data.groupId > 0 ? 'role="treeitem"' : 'role="option"'}>
+              <img src="${props.icon}" style="width:20px;height:20px;margin-right:8px;border-radius:50%;vertical-align:middle">
+              <b>${props.code}</b> <span style="color:#aaa;font-size:.97em;">${props.name}</span>
+            </div>
+          `);
+        }
+      };
+    }
+  });
+}
+
+function getCurrency(code) {
+  return currencies.find(c => c.code === code);
+}
+
+async function getExchangeRate(fromCode, toCode) {
+  const fromId = cgMap[fromCode], toId = cgMap[toCode];
   if (!fromId || !toId) return null;
-  // Якщо обидва — крипта, Coingecko підтримує такий запит (btc в eth і т.д.)
-  // Якщо один — фіат, інший — крипта: теж ок
   const url = `https://api.coingecko.com/api/v3/simple/price?ids=${fromId}&vs_currencies=${toId}`;
   try {
     const res = await fetch(url);
@@ -127,45 +83,98 @@ async function getExchangeRate(from, to) {
   }
 }
 
-if (calcForm) {
-  calcForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    resultDiv.textContent = "Завантаження...";
-    const amount = parseFloat(document.getElementById('amount').value);
-    const from = fiatChoices.getValue(true);
-    const to = cryptoChoices.getValue(true);
+function showRateInfo(rate, from, to) {
+  const rateWithFee = rate * 1.02;
+  document.getElementById('rate-info').innerHTML = `
+    <img src="${getCurrency(from).icon}" style="width:18px;height:18px;vertical-align:middle;border-radius:50%;"> 
+    1 ${from} ≈ <b>${rateWithFee.toFixed(8)} ${to}</b>
+    <img src="${getCurrency(to).icon}" style="width:18px;height:18px;vertical-align:middle;border-radius:50%;"> 
+    <span style="color:#aaa">(з комісією 2%)</span>
+  `;
+}
 
-    if (!amount || amount <= 0) {
-      resultDiv.textContent = "Введіть коректну суму.";
+async function recalc(direction = "from") {
+  const from = fromChoices.getValue(true);
+  const to = toChoices.getValue(true);
+  if (from === to) {
+    document.getElementById('rate-info').textContent = "Валюти повинні відрізнятися!";
+    document.getElementById('to-amount').value = "";
+    return;
+  }
+  const rate = await getExchangeRate(from, to);
+  if (!rate) {
+    document.getElementById('rate-info').textContent = "Курс не знайдено!";
+    document.getElementById('to-amount').value = "";
+    return;
+  }
+  showRateInfo(rate, from, to);
+  let fromAmount = parseFloat(document.getElementById('from-amount').value);
+  let toAmount = parseFloat(document.getElementById('to-amount').value);
+
+  if (direction === "from" && fromAmount > 0) {
+    let rateWithFee = rate * 1.02;
+    document.getElementById('to-amount').value = (fromAmount / rateWithFee).toFixed(8);
+  } else if (direction === "to" && toAmount > 0) {
+    let rateWithFee = rate * 1.02;
+    document.getElementById('from-amount').value = (toAmount * rateWithFee).toFixed(2);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Стартові валютні пари
+  fromChoices = fillChoices('from-currency', currencies, 'UAH');
+  toChoices = fillChoices('to-currency', currencies, 'BTC');
+  recalc();
+
+  document.getElementById('from-amount').addEventListener('input', () => recalc("from"));
+  document.getElementById('to-amount').addEventListener('input', () => recalc("to"));
+  document.getElementById('from-currency').addEventListener('change', () => recalc("from"));
+  document.getElementById('to-currency').addEventListener('change', () => recalc("from"));
+
+  // Свап
+  document.getElementById('swap-btn').addEventListener('click', () => {
+    // Міняємо місцями валюту
+    let from = fromChoices.getValue(true);
+    let to = toChoices.getValue(true);
+
+    fromChoices.setChoiceByValue(to);
+    toChoices.setChoiceByValue(from);
+
+    // Міняємо місцями суми
+    let fromA = document.getElementById('from-amount').value;
+    let toA = document.getElementById('to-amount').value;
+    document.getElementById('from-amount').value = toA;
+    document.getElementById('to-amount').value = fromA;
+
+    recalc("from");
+  });
+
+  // Вводити тільки в лівий input, правий сам перерахує
+  document.getElementById('to-amount').setAttribute('readonly', 'readonly');
+
+  // Сабміт
+  document.getElementById('exchange-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    document.getElementById('result-message').textContent = '';
+    const from = fromChoices.getValue(true);
+    const to = toChoices.getValue(true);
+    let fromA = parseFloat(document.getElementById('from-amount').value);
+    let toA = parseFloat(document.getElementById('to-amount').value);
+
+    if (!fromA || fromA <= 0) {
+      document.getElementById('result-message').textContent = "Введіть коректну суму для обміну.";
       return;
     }
     if (from === to) {
-      resultDiv.textContent = "Валюти повинні відрізнятися!";
+      document.getElementById('result-message').textContent = "Валюти повинні бути різними!";
       return;
     }
-    const rate = await getExchangeRate(from, to);
-    if (!rate) {
-      resultDiv.textContent = "Курс не знайдено.";
+    if (!toA || toA <= 0) {
+      document.getElementById('result-message').textContent = "Неможливо розрахувати обмін — спробуйте ще раз.";
       return;
     }
-    // Додаємо +2% комісії
-    const rateWithFee = rate * 1.02;
-    const toAmount = amount / rateWithFee;
-
-    const fromObj = [ ...fiatList, ...cryptoList ].find(x => x.code === from);
-    const toObj = [ ...fiatList, ...cryptoList ].find(x => x.code === to);
-
-    resultDiv.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px">
-        <img src="${fromObj.icon}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle">
-        <b>${amount} ${from}</b>
-        <span style="color:#aaa">→</span>
-        <img src="${toObj.icon}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle">
-        <b>${toAmount.toFixed(6)} ${to}</b>
-      </div>
-      <div style="margin-top:8px">
-        Курс з комісією: <b>1 ${to} = ${(1/rateWithFee).toFixed(8)} ${from}</b>
-      </div>
+    document.getElementById('result-message').innerHTML = `
+      ✅ <b>${fromA} ${from}</b> → <b>${toA} ${to}</b> — заявка відправлена!
     `;
   });
-}
+});
