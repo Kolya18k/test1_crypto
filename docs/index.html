@@ -2,43 +2,42 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=400, initial-scale=1.0">
   <title>Калькулятор обміну</title>
-  <meta name="viewport" content="width=400, initial-scale=1">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="exchange-card">
+  <div class="exchange-container">
     <h2>Калькулятор обміну</h2>
     <form id="exchange-form" autocomplete="off">
       <div class="row">
-        <div class="form-group sum-group">
-          <label for="amount">Сума</label>
-          <input type="number" id="amount" min="0" step="any" required>
+        <div class="form-group">
+          <label for="fiat-amount">Сума</label>
+          <input type="number" id="fiat-amount" min="0" step="any" value="1000" required>
         </div>
-        <div class="form-group currency-group">
-          <label for="fiat">Валюта</label>
+        <div class="form-group">
+          <label for="fiat-currency">Валюта</label>
           <div class="select-with-icon">
-            <img id="fiat-icon" src="assets/icons/eur.svg" alt="icon">
-            <select id="fiat">
-              <!-- options inserted by JS -->
+            <img id="fiat-icon" src="assets/icons/eur.svg" alt="" class="currency-icon">
+            <select id="fiat-currency">
+              <!-- Валюти додаються через JS -->
             </select>
           </div>
         </div>
       </div>
       <div class="form-group">
-        <label for="crypto">Оберіть криптовалюту</label>
+        <label for="crypto-currency">Oберіть криптовалюту</label>
         <div class="select-with-icon">
-          <img id="crypto-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="icon">
-          <select id="crypto">
-            <!-- options inserted by JS -->
+          <img id="crypto-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="" class="currency-icon">
+          <select id="crypto-currency">
+            <!-- Криптовалюти додаються через JS -->
           </select>
         </div>
       </div>
-      <button type="submit" class="submit-btn">Розрахувати</button>
-      <div class="result" id="result"></div>
-      <div class="commission">У курс додано +2% комісії</div>
-      <div class="error" id="error"></div>
+      <button type="submit" class="btn-green">Розрахувати</button>
     </form>
+    <div id="result"></div>
+    <div class="note">У курс додано +2% комісії</div>
   </div>
   <script src="main.js"></script>
 </body>
