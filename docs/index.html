@@ -9,21 +9,21 @@
 </head>
 <body>
   <div class="exchange-container">
-    <h2>Професійний Крипто-Обмінник</h2>
+    <h2>Крипто-Обмінник</h2>
     <form id="exchange-form" autocomplete="off">
-      <div class="fields-row">
-        <div class="field-block">
-          <label for="from-amount">Віддаєте</label>
-          <div class="input-select">
-            <input type="number" id="from-amount" min="0" step="any" placeholder="0.00" required>
+      <div class="row">
+        <div class="block">
+          <label for="from-amount">Ви віддаєте</label>
+          <div class="select-row">
+            <input type="number" id="from-amount" min="0" step="any" placeholder="0">
             <select id="from-currency"></select>
           </div>
         </div>
         <button type="button" id="swap-btn" class="swap-btn" title="Свап"></button>
-        <div class="field-block">
-          <label for="to-amount">Отримаєте</label>
-          <div class="input-select">
-            <input type="number" id="to-amount" min="0" step="any" placeholder="0.00" disabled>
+        <div class="block">
+          <label for="to-amount">Ви отримуєте</label>
+          <div class="select-row">
+            <input type="number" id="to-amount" min="0" step="any" placeholder="0" disabled>
             <select id="to-currency"></select>
           </div>
         </div>
@@ -32,7 +32,7 @@
       <button type="submit" class="exchange-btn">Обміняти</button>
       <div class="result-message" id="result-message"></div>
     </form>
-    <div class="footer-note">* У курс додано +2% комісії</div>
+    <div class="footer-note">* Курс включає +2% комісії</div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
   <script src="main.js"></script>
