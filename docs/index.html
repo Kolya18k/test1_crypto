@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Крипто-калькулятор</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Стилі -->
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 </head>
@@ -15,13 +16,16 @@
         <label for="amount">Сума</label>
         <input type="number" id="amount" name="amount" min="0" step="any" required placeholder="Введіть суму">
       </div>
-      <div class="form-row">
-        <label for="fiat-currency">Валюта</label>
-        <select id="fiat-currency" name="fiat-currency" required></select>
-      </div>
-      <div class="form-row">
-        <label for="crypto-currency">Криптовалюта</label>
-        <select id="crypto-currency" name="crypto-currency" required></select>
+      <div class="swap-row">
+        <div class="form-row select-col">
+          <label for="fiat-currency">Валюта</label>
+          <select id="fiat-currency" name="fiat-currency" required></select>
+        </div>
+        <button type="button" id="swap-btn" class="swap-btn" title="Поміняти місцями"></button>
+        <div class="form-row select-col">
+          <label for="crypto-currency">Криптовалюта</label>
+          <select id="crypto-currency" name="crypto-currency" required></select>
+        </div>
       </div>
       <button type="submit" class="btn-primary">Розрахувати</button>
       <div id="result" class="calc-result"></div>
