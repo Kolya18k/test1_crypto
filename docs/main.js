@@ -1,14 +1,14 @@
 // --- Дані валют ---
 const currencies = [
-  {code: 'UAH', name: 'Гривня', icon: 'assets/icons/uah.svg', type: 'fiat'},
-  {code: 'USD', name: 'Долар США', icon: 'assets/icons/usd.svg', type: 'fiat'},
-  {code: 'EUR', name: 'Євро', icon: 'assets/icons/eur.svg', type: 'fiat'},
-  {code: 'BTC', name: 'Bitcoin', icon: 'assets/icons/btc.svg', type: 'crypto'},
-  {code: 'ETH', name: 'Ethereum', icon: 'assets/icons/eth.svg', type: 'crypto'},
-  {code: 'USDT', name: 'Tether', icon: 'assets/icons/usdt.svg', type: 'crypto'},
-  {code: 'BNB', name: 'Binance Coin', icon: 'assets/icons/bnb.svg', type: 'crypto'},
-  {code: 'SOL', name: 'Solana', icon: 'assets/icons/sol.svg', type: 'crypto'},
-  {code: 'TON', name: 'Toncoin', icon: 'assets/icons/ton.svg', type: 'crypto'}
+  {code: 'UAH', name: 'Гривня', icon: 'assets/icons/uah.svg'},
+  {code: 'USD', name: 'Долар', icon: 'assets/icons/usd.svg'},
+  {code: 'EUR', name: 'Євро', icon: 'assets/icons/eur.svg'},
+  {code: 'BTC', name: 'Bitcoin', icon: 'assets/icons/btc.svg'},
+  {code: 'ETH', name: 'Ethereum', icon: 'assets/icons/eth.svg'},
+  {code: 'USDT', name: 'Tether', icon: 'assets/icons/usdt.svg'},
+  {code: 'BNB', name: 'Binance Coin', icon: 'assets/icons/bnb.svg'},
+  {code: 'SOL', name: 'Solana', icon: 'assets/icons/sol.svg'},
+  {code: 'TON', name: 'Toncoin', icon: 'assets/icons/ton.svg'}
 ];
 
 const cgMap = {
@@ -48,7 +48,7 @@ function fillChoices(selectId, currList, defaultCode) {
           return template(`
             <div class="${classNames.item} ${classNames.itemSelectable}" data-item data-id="${data.id}" data-value="${data.value}" ${data.active ? 'aria-selected="true"' : ''} ${data.disabled ? 'aria-disabled="true"' : ''}>
               <img src="${props.icon}" style="width:20px;height:20px;margin-right:8px;border-radius:50%;vertical-align:middle">
-              ${props.code}
+              <span>${props.code}</span>
             </div>
           `);
         },
@@ -97,7 +97,7 @@ async function recalc(direction = "from") {
   const from = fromChoices.getValue(true);
   const to = toChoices.getValue(true);
   if (from === to) {
-    document.getElementById('rate-info').textContent = "Валюти повинні відрізнятися!";
+    document.getElementById('rate-info').textContent = "Валюти повинні бути різними!";
     document.getElementById('to-amount').value = "";
     return;
   }
@@ -121,7 +121,6 @@ async function recalc(direction = "from") {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Стартові валютні пари
   fromChoices = fillChoices('from-currency', currencies, 'UAH');
   toChoices = fillChoices('to-currency', currencies, 'BTC');
   recalc();
@@ -131,16 +130,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('from-currency').addEventListener('change', () => recalc("from"));
   document.getElementById('to-currency').addEventListener('change', () => recalc("from"));
 
-  // Свап
   document.getElementById('swap-btn').addEventListener('click', () => {
-    // Міняємо місцями валюту
     let from = fromChoices.getValue(true);
     let to = toChoices.getValue(true);
 
     fromChoices.setChoiceByValue(to);
     toChoices.setChoiceByValue(from);
 
-    // Міняємо місцями суми
     let fromA = document.getElementById('from-amount').value;
     let toA = document.getElementById('to-amount').value;
     document.getElementById('from-amount').value = toA;
@@ -149,10 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
     recalc("from");
   });
 
-  // Вводити тільки в лівий input, правий сам перерахує
   document.getElementById('to-amount').setAttribute('readonly', 'readonly');
 
-  // Сабміт
   document.getElementById('exchange-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     document.getElementById('result-message').textContent = '';
@@ -174,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     document.getElementById('result-message').innerHTML = `
-      ✅ <b>${fromA} ${from}</b> → <b>${toA} ${to}</b> — заявка відправлена!
+      ✅ <b>${fromA} ${from}</b> → <b>${toA} ${to}</b> — заявка на обмін створена!
     `;
   });
 });
