@@ -33,6 +33,9 @@
     .form-group {
       margin-bottom: 15px;
     }
+    #second-column {
+      margin-top: -10px; /* Підтягує криптовалюту ближче до свапу */
+    }
     label {
       display: block;
       margin-bottom: 5px;
@@ -71,7 +74,8 @@
     .swap-btn {
       display: flex;
       justify-content: center;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
+      margin-top: -10px;
     }
     .swap-btn button {
       background: transparent;
@@ -153,10 +157,13 @@
       const second = secondColumn.innerHTML;
       firstColumn.innerHTML = second;
       secondColumn.innerHTML = first;
-      document.getElementById("fiat").addEventListener("change", () => {
+
+      // Після свапу знову підв'язати події
+      document.getElementById("fiat")?.addEventListener("change", () => {
         document.getElementById("fiat-icon").src = `assets/icons/${document.getElementById("fiat").options[document.getElementById("fiat").selectedIndex].dataset.icon}`;
       });
-      document.getElementById("crypto").addEventListener("change", () => {
+
+      document.getElementById("crypto")?.addEventListener("change", () => {
         document.getElementById("crypto-icon").src = `assets/icons/${document.getElementById("crypto").options[document.getElementById("crypto").selectedIndex].dataset.icon}`;
       });
     }
