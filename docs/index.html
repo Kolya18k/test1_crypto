@@ -96,11 +96,7 @@
       <label id="first-label" for="first-select">Фіат</label>
       <div class="select-wrapper">
         <img id="first-icon" class="select-icon" src="assets/icons/usd.svg" alt="usd">
-        <select id="first-select">
-          <option value="usd" data-icon="usd.svg">USD (Долар)</option>
-          <option value="eur" data-icon="eur.svg">EUR (Євро)</option>
-          <option value="uah" data-icon="uah.svg">UAH (Гривня)</option>
-        </select>
+        <select id="first-select"></select>
       </div>
     </div>
     <div class="swap-btn">
@@ -110,21 +106,39 @@
       <label id="second-label" for="second-select">Криптовалюта</label>
       <div class="select-wrapper">
         <img id="second-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
-        <select id="second-select">
-          <option value="bitcoin" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
-          <option value="ethereum" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
-          <option value="tether" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
-          <option value="binancecoin" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
-          <option value="solana" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
-        </select>
+        <select id="second-select"></select>
       </div>
     </div>
     <button onclick="calculate()">Розрахувати</button>
     <div class="result" id="result"></div>
   </div>
   <script>
-    const fiatList = ['usd', 'eur', 'uah'];
-    const cryptoList = ['bitcoin', 'ethereum', 'tether', 'binancecoin', 'solana'];
+    const fiatOptions = [
+      { value: 'usd', text: 'USD (Долар)', icon: 'usd.svg', symbol: 'USD' },
+      { value: 'eur', text: 'EUR (Євро)', icon: 'eur.svg', symbol: 'EUR' },
+      { value: 'uah', text: 'UAH (Гривня)', icon: 'uah.svg', symbol: 'UAH' }
+    ];
+
+    const cryptoOptions = [
+      { value: 'bitcoin', text: 'Bitcoin (BTC)', icon: 'bitcoin-btc-logo.svg', symbol: 'BTC' },
+      { value: 'ethereum', text: 'Ethereum (ETH)', icon: 'ethereum-eth-logo.svg', symbol: 'ETH' },
+      { value: 'tether', text: 'Tether (USDT)', icon: 'tether-usdt-logo.svg', symbol: 'USDT' },
+      { value: 'binancecoin', text: 'Binance Coin (BNB)', icon: 'binance-coin-bnb-logo.svg', symbol: 'BNB' },
+      { value: 'solana', text: 'Solana (SOL)', icon: 'solana-sol-logo.svg', symbol: 'SOL' }
+    ];
+
+    function populateSelect(selectId, options) {
+      const select = document.getElementById(selectId);
+      select.innerHTML = '';
+      options.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option.value;
+        opt.text = option.text;
+        opt.dataset.icon = option.icon;
+        opt.dataset.symbol = option.symbol;
+        select.appendChild(opt);
+      });
+    }
 
     function updateIcon(selectId, iconId) {
       const select = document.getElementById(selectId);
@@ -132,51 +146,44 @@
       icon.src = `assets/icons/${select.options[select.selectedIndex].dataset.icon}`;
     }
 
+    function updateLabels() {
+      const firstSelect = document.getElementById('first-select');
+      const secondSelect = document.getElementById('second-select');
+      document.getElementById('first-label').innerText = fiatOptions.some(opt => opt.value === firstSelect.value) ? 'Фіат' : 'Криптовалюта';
+      document.getElementById('second-label').innerText = fiatOptions.some(opt => opt.value === secondSelect.value) ? 'Фіат' : 'Криптовалюта';
+    }
+
     function swapFields() {
       const firstSelect = document.getElementById("first-select");
       const secondSelect = document.getElementById("second-select");
-      const firstIcon = document.getElementById("first-icon");
-      const secondIcon = document.getElementById("second-icon");
-      const firstLabel = document.getElementById("first-label");
-      const secondLabel = document.getElementById("second-label");
 
-      // Swap values
       const tempVal = firstSelect.value;
+      const tempIcon = firstSelect.options[firstSelect.selectedIndex].dataset.icon;
+      const tempSymbol = firstSelect.options[firstSelect.selectedIndex].dataset.symbol;
+
       firstSelect.value = secondSelect.value;
       secondSelect.value = tempVal;
 
-      // Swap icons
-      const tempIcon = firstIcon.src;
-      firstIcon.src = secondIcon.src;
-      secondIcon.src = tempIcon;
-
-      // Swap labels
-      const tempText = firstLabel.innerText;
-      firstLabel.innerText = secondLabel.innerText;
-      secondLabel.innerText = tempText;
-
       updateIcon("first-select", "first-icon");
       updateIcon("second-select", "second-icon");
+      updateLabels();
     }
 
     async function getRate(from, to) {
-      try {
-        const fromIsFiat = fiatList.includes(from);
-        const toIsFiat = fiatList.includes(to);
+      const fiatList = fiatOptions.map(opt => opt.value);
+      const fromIsFiat = fiatList.includes(from);
+      const toIsFiat = fiatList.includes(to);
 
-        if (fromIsFiat && !toIsFiat) {
-          const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${to}&vs_currencies=${from}`);
-          const data = await res.json();
-          return data[to][from];
-        } else if (!fromIsFiat && toIsFiat) {
-          const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`);
-          const data = await res.json();
-          return 1 / data[from][to];
-        } else {
-          throw new Error("Можлива лише конверсія між фіатом і криптою");
-        }
-      } catch (e) {
-        throw new Error("Курс не знайдено");
+      if (fromIsFiat && !toIsFiat) {
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${to}&vs_currencies=${from}`);
+        const data = await res.json();
+        return data[to][from];
+      } else if (!fromIsFiat && toIsFiat) {
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`);
+        const data = await res.json();
+        return 1 / data[from][to];
+      } else {
+        throw new Error("Можлива лише конверсія між фіатом і криптою");
       }
     }
 
@@ -184,24 +191,36 @@
       const amount = parseFloat(document.getElementById('amount').value);
       const from = document.getElementById("first-select").value;
       const to = document.getElementById("second-select").value;
+      const toSymbol = document.getElementById("second-select").selectedOptions[0].dataset.symbol;
 
       if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
       try {
         const rate = await getRate(from, to);
         const result = (amount * rate * 0.98).toFixed(6);
-        document.getElementById("result").innerText = `≈ ${result} ${to.toUpperCase()}`;
+        document.getElementById("result").innerText = `≈ ${result} ${toSymbol}`;
       } catch (error) {
         alert("Помилка отримання курсу: " + error.message);
       }
     }
 
-    document.getElementById("first-select").addEventListener("change", () => updateIcon("first-select", "first-icon"));
-    document.getElementById("second-select").addEventListener("change", () => updateIcon("second-select", "second-icon"));
+    populateSelect("first-select", fiatOptions);
+    populateSelect("second-select", cryptoOptions);
+
+    document.getElementById("first-select").addEventListener("change", () => {
+      updateIcon("first-select", "first-icon");
+      updateLabels();
+    });
+    document.getElementById("second-select").addEventListener("change", () => {
+      updateIcon("second-select", "second-icon");
+      updateLabels();
+    });
 
     updateIcon("first-select", "first-icon");
     updateIcon("second-select", "second-icon");
+    updateLabels();
   </script>
 </body>
 </html>
+
 
