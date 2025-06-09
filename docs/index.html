@@ -31,7 +31,7 @@
       margin-bottom: 20px;
     }
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     label {
       display: block;
@@ -71,7 +71,7 @@
     .swap-btn {
       display: flex;
       justify-content: center;
-      margin-bottom: 15px;
+      margin: 15px 0 10px;
     }
     .swap-btn button {
       background: transparent;
@@ -88,9 +88,6 @@
     .select-icon {
       width: 24px;
       height: 24px;
-    }
-    #second-column {
-      margin-top: -10px;
     }
   </style>
 </head>
@@ -140,51 +137,37 @@
     const firstColumn = document.getElementById("first-column");
     const secondColumn = document.getElementById("second-column");
 
-    fiatSelect.addEventListener("change", () => {
-      fiatIcon.src = `assets/icons/${fiatSelect.options[fiatSelect.selectedIndex].dataset.icon}`;
-    });
+    function updateIcons() {
+      const fiatEl = document.getElementById("fiat");
+      const cryptoEl = document.getElementById("crypto");
+      document.getElementById("fiat-icon").src = `assets/icons/${fiatEl.options[fiatEl.selectedIndex].dataset.icon}`;
+      document.getElementById("crypto-icon").src = `assets/icons/${cryptoEl.options[cryptoEl.selectedIndex].dataset.icon}`;
+    }
 
-    cryptoSelect.addEventListener("change", () => {
-      cryptoIcon.src = `assets/icons/${cryptoSelect.options[cryptoSelect.selectedIndex].dataset.icon}`;
-    });
+    fiatSelect.addEventListener("change", updateIcons);
+    cryptoSelect.addEventListener("change", updateIcons);
 
     let isFiatFirst = true;
 
     function swapFields() {
       isFiatFirst = !isFiatFirst;
-
-      const firstHTML = firstColumn.innerHTML;
-      const secondHTML = secondColumn.innerHTML;
-
-      firstColumn.innerHTML = secondHTML;
-      secondColumn.innerHTML = firstHTML;
-
+      const tempHTML = firstColumn.innerHTML;
+      firstColumn.innerHTML = secondColumn.innerHTML;
+      secondColumn.innerHTML = tempHTML;
       updateIcons();
     }
 
-    function updateIcons() {
-      const fiat = document.getElementById("fiat");
-      const fiatIconEl = document.getElementById("fiat-icon");
-      const crypto = document.getElementById("crypto");
-      const cryptoIconEl = document.getElementById("crypto-icon");
-
-      if (fiat && fiatIconEl) {
-        fiat.addEventListener("change", () => {
-          fiatIconEl.src = `assets/icons/${fiat.options[fiat.selectedIndex].dataset.icon}`;
-        });
-      }
-
-      if (crypto && cryptoIconEl) {
-        crypto.addEventListener("change", () => {
-          cryptoIconEl.src = `assets/icons/${crypto.options[crypto.selectedIndex].dataset.icon}`;
-        });
-      }
-    }
-
     async function getRate(from, to) {
-      const res = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${from}&tsyms=${to}`);
-      const data = await res.json();
-      return data[to];
+      const url = `https://api.kraken.com/0/public/Ticker?pair=${from}${to}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const pairKey = Object.keys(data.result)[0];
+        return parseFloat(data.result[pairKey].c[0]);
+      } catch (e) {
+        alert("Помилка отримання курсу з Kraken");
+        return 0;
+      }
     }
 
     async function calculate() {
@@ -195,6 +178,8 @@
       if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
       const rate = await getRate(from, to);
+      if (!rate) return;
+
       const result = isFiatFirst
         ? (amount / rate * 0.98).toFixed(6)
         : (amount * rate * 0.98).toFixed(2);
