@@ -33,12 +33,6 @@
     .form-group {
       margin-bottom: 15px;
     }
-    .form-columns {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
     label {
       display: block;
       margin-bottom: 5px;
@@ -95,6 +89,9 @@
       width: 24px;
       height: 24px;
     }
+    #second-column {
+      margin-top: -10px;
+    }
   </style>
 </head>
 <body>
@@ -104,34 +101,32 @@
       <label for="amount">Сума</label>
       <input type="number" id="amount" placeholder="Введіть суму" />
     </div>
-    <div class="form-columns">
-      <div class="form-group" id="first-column">
-        <label for="fiat">Валюта</label>
-        <div class="select-wrapper">
-          <img id="fiat-icon" class="select-icon" src="assets/icons/usd.svg" alt="usd">
-          <select id="fiat">
-            <option value="USD" data-icon="usd.svg">USD (Долар)</option>
-            <option value="EUR" data-icon="eur.svg">EUR (Євро)</option>
-            <option value="UAH" data-icon="uah.svg">UAH (Гривня)</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group" id="second-column">
-        <label for="crypto">Криптовалюта</label>
-        <div class="select-wrapper">
-          <img id="crypto-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
-          <select id="crypto">
-            <option value="BTC" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
-            <option value="ETH" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
-            <option value="USDT" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
-            <option value="BNB" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
-            <option value="SOL" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
-          </select>
-        </div>
+    <div class="form-group" id="first-column">
+      <label for="fiat">Валюта</label>
+      <div class="select-wrapper">
+        <img id="fiat-icon" class="select-icon" src="assets/icons/usd.svg" alt="usd">
+        <select id="fiat">
+          <option value="USD" data-icon="usd.svg">USD (Долар)</option>
+          <option value="EUR" data-icon="eur.svg">EUR (Євро)</option>
+          <option value="UAH" data-icon="uah.svg">UAH (Гривня)</option>
+        </select>
       </div>
     </div>
     <div class="swap-btn">
       <button onclick="swapFields()">⇅</button>
+    </div>
+    <div class="form-group" id="second-column">
+      <label for="crypto">Криптовалюта</label>
+      <div class="select-wrapper">
+        <img id="crypto-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
+        <select id="crypto">
+          <option value="BTC" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
+          <option value="ETH" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
+          <option value="USDT" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
+          <option value="BNB" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
+          <option value="SOL" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
+        </select>
+      </div>
     </div>
     <button onclick="calculate()">Розрахувати</button>
     <div class="result" id="result"></div>
@@ -157,25 +152,33 @@
 
     function swapFields() {
       isFiatFirst = !isFiatFirst;
-      const temp = firstColumn.innerHTML;
-      firstColumn.innerHTML = secondColumn.innerHTML;
-      secondColumn.innerHTML = temp;
 
-      setTimeout(() => {
-        document.getElementById("fiat")?.addEventListener("change", () => {
-          document.getElementById("fiat-icon").src = `assets/icons/${document.getElementById("fiat").options[document.getElementById("fiat").selectedIndex].dataset.icon}`;
-        });
-        document.getElementById("crypto")?.addEventListener("change", () => {
-          document.getElementById("crypto-icon").src = `assets/icons/${document.getElementById("crypto").options[document.getElementById("crypto").selectedIndex].dataset.icon}`;
-        });
+      const firstHTML = firstColumn.innerHTML;
+      const secondHTML = secondColumn.innerHTML;
 
-        // Оновлюємо іконки після свапу
-        if (isFiatFirst) {
-          document.getElementById("fiat-icon").src = `assets/icons/${document.getElementById("fiat").options[document.getElementById("fiat").selectedIndex].dataset.icon}`;
-        } else {
-          document.getElementById("crypto-icon").src = `assets/icons/${document.getElementById("crypto").options[document.getElementById("crypto").selectedIndex].dataset.icon}`;
-        }
-      }, 0);
+      firstColumn.innerHTML = secondHTML;
+      secondColumn.innerHTML = firstHTML;
+
+      updateIcons();
+    }
+
+    function updateIcons() {
+      const fiat = document.getElementById("fiat");
+      const fiatIconEl = document.getElementById("fiat-icon");
+      const crypto = document.getElementById("crypto");
+      const cryptoIconEl = document.getElementById("crypto-icon");
+
+      if (fiat && fiatIconEl) {
+        fiat.addEventListener("change", () => {
+          fiatIconEl.src = `assets/icons/${fiat.options[fiat.selectedIndex].dataset.icon}`;
+        });
+      }
+
+      if (crypto && cryptoIconEl) {
+        crypto.addEventListener("change", () => {
+          cryptoIconEl.src = `assets/icons/${crypto.options[crypto.selectedIndex].dataset.icon}`;
+        });
+      }
     }
 
     async function getRate(from, to) {
