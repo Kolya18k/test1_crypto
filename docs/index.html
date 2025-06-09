@@ -102,7 +102,7 @@
       <label for="fiat">Валюта</label>
       <div class="select-wrapper">
         <img id="fiat-icon" class="select-icon" src="assets/icons/usd.svg" alt="usd">
-        <select id="fiat" onchange="updateIcon('fiat')">
+        <select id="fiat">
           <option value="USD" data-icon="usd.svg">USD (Долар)</option>
           <option value="EUR" data-icon="eur.svg">EUR (Євро)</option>
           <option value="UAH" data-icon="uah.svg">UAH (Гривня)</option>
@@ -112,11 +112,11 @@
     <div class="swap-btn">
       <button onclick="swapFields()">⇅</button>
     </div>
-    <div class="form-group" id="second-column" style="margin-top: 10px;">
+    <div class="form-group" id="second-column" style="margin-top: -10px;">
       <label for="crypto">Криптовалюта</label>
       <div class="select-wrapper">
         <img id="crypto-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
-        <select id="crypto" onchange="updateIcon('crypto')">
+        <select id="crypto">
           <option value="BTC" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
           <option value="ETH" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
           <option value="USDT" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
@@ -130,46 +130,60 @@
   </div>
 
   <script>
-    function updateIcon(type) {
-      const select = document.getElementById(type);
-      const icon = document.getElementById(type + "-icon");
-      icon.src = `assets/icons/${select.options[select.selectedIndex].dataset.icon}`;
+    let isFiatFirst = true;
+
+    function updateIcons() {
+      const fiatSelect = document.getElementById("fiat");
+      const cryptoSelect = document.getElementById("crypto");
+      const fiatIcon = document.getElementById("fiat-icon");
+      const cryptoIcon = document.getElementById("crypto-icon");
+
+      if (fiatSelect && fiatIcon) {
+        fiatIcon.src = `assets/icons/${fiatSelect.options[fiatSelect.selectedIndex].dataset.icon}`;
+      }
+      if (cryptoSelect && cryptoIcon) {
+        cryptoIcon.src = `assets/icons/${cryptoSelect.options[cryptoSelect.selectedIndex].dataset.icon}`;
+      }
     }
 
+    document.getElementById("fiat").addEventListener("change", updateIcons);
+    document.getElementById("crypto").addEventListener("change", updateIcons);
+
     function swapFields() {
-      const firstHTML = document.getElementById("first-column").innerHTML;
-      const secondHTML = document.getElementById("second-column").innerHTML;
+      isFiatFirst = !isFiatFirst;
+      const first = document.getElementById("first-column").innerHTML;
+      const second = document.getElementById("second-column").innerHTML;
+      document.getElementById("first-column").innerHTML = second;
+      document.getElementById("second-column").innerHTML = first;
 
-      document.getElementById("first-column").innerHTML = secondHTML;
-      document.getElementById("second-column").innerHTML = firstHTML;
-
-      document.querySelectorAll("select").forEach(select => {
-        const type = select.id.includes("fiat") ? "fiat" : "crypto";
-        select.addEventListener("change", () => updateIcon(type));
-        updateIcon(type);
-      });
+      document.getElementById("fiat")?.addEventListener("change", updateIcons);
+      document.getElementById("crypto")?.addEventListener("change", updateIcons);
+      updateIcons();
     }
 
     async function getRate(from, to) {
-      const res = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${from}&tsyms=${to}`);
+      const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from.toLowerCase()}&vs_currencies=${to.toLowerCase()}`);
       const data = await res.json();
-      return data[to];
+      return data[from.toLowerCase()][to.toLowerCase()];
     }
 
     async function calculate() {
       const amount = parseFloat(document.getElementById('amount').value);
-      const from = document.querySelectorAll("select")[0].value;
-      const to = document.querySelectorAll("select")[1].value;
+      const from = isFiatFirst ? document.getElementById("fiat").value : document.getElementById("crypto").value;
+      const to = isFiatFirst ? document.getElementById("crypto").value : document.getElementById("fiat").value;
 
       if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
       const rate = await getRate(from, to);
-      const result = from === document.getElementById("fiat").value
+      const result = isFiatFirst
         ? (amount / rate * 0.98).toFixed(6)
         : (amount * rate * 0.98).toFixed(2);
 
       document.getElementById("result").innerText = `≈ ${result} ${to}`;
     }
+
+    updateIcons();
   </script>
 </body>
 </html>
+
