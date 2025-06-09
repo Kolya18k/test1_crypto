@@ -71,7 +71,7 @@
     .swap-btn {
       display: flex;
       justify-content: center;
-      margin-bottom: 15px;
+      margin-bottom: 5px;
     }
     .swap-btn button {
       background: transparent;
@@ -112,7 +112,7 @@
     <div class="swap-btn">
       <button onclick="swapFields()">⇅</button>
     </div>
-    <div class="form-group" id="second-column" style="margin-top: -5px;">
+    <div class="form-group" id="second-column" style="margin-top: -10px;">
       <label id="second-label" for="crypto">Криптовалюта</label>
       <div class="select-wrapper">
         <img id="crypto-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
@@ -152,21 +152,20 @@
     function swapFields() {
       isFiatFirst = !isFiatFirst;
 
-      const firstLabel = document.getElementById("first-label");
-      const secondLabel = document.getElementById("second-label");
-      const first = document.getElementById("first-column").innerHTML;
-      const second = document.getElementById("second-column").innerHTML;
+      const firstColumn = document.getElementById("first-column");
+      const secondColumn = document.getElementById("second-column");
+      const firstLabel = document.getElementById("first-label").textContent;
+      const secondLabel = document.getElementById("second-label").textContent;
 
-      document.getElementById("first-column").innerHTML = second;
-      document.getElementById("second-column").innerHTML = first;
+      const firstHTML = firstColumn.innerHTML;
+      const secondHTML = secondColumn.innerHTML;
 
-      // Swap labels as well
-      const tempLabel = firstLabel.textContent;
-      firstLabel.textContent = secondLabel.textContent;
-      secondLabel.textContent = tempLabel;
+      firstColumn.innerHTML = secondHTML;
+      secondColumn.innerHTML = firstHTML;
 
-      document.getElementById("fiat")?.addEventListener("change", updateIcons);
-      document.getElementById("crypto")?.addEventListener("change", updateIcons);
+      document.getElementById("first-label").textContent = secondLabel;
+      document.getElementById("second-label").textContent = firstLabel;
+
       updateIcons();
     }
 
@@ -195,4 +194,3 @@
   </script>
 </body>
 </html>
-
