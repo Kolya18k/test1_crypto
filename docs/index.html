@@ -102,7 +102,11 @@
       <label id="first-label" for="first-select">Валюта</label>
       <div class="select-wrapper">
         <img id="first-icon" class="select-icon" src="assets/icons/usd.svg" alt="usd">
-        <select id="first-select"></select>
+        <select id="first-select">
+          <option value="usd" data-icon="usd.svg">USD (Долар)</option>
+          <option value="eur" data-icon="eur.svg">EUR (Євро)</option>
+          <option value="uah" data-icon="uah.svg">UAH (Гривня)</option>
+        </select>
       </div>
     </div>
     <div class="swap-btn">
@@ -112,7 +116,13 @@
       <label id="second-label" for="second-select">Криптовалюта</label>
       <div class="select-wrapper">
         <img id="second-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
-        <select id="second-select"></select>
+        <select id="second-select">
+          <option value="bitcoin" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
+          <option value="ethereum" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
+          <option value="tether" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
+          <option value="binancecoin" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
+          <option value="solana" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
+        </select>
       </div>
     </div>
     <button onclick="calculate()">Розрахувати</button>
@@ -120,35 +130,6 @@
   </div>
 
   <script>
-    const fiatOptions = [
-      { code: 'USD', name: 'Долар', icon: 'usd.svg' },
-      { code: 'EUR', name: 'Євро', icon: 'eur.svg' },
-      { code: 'UAH', name: 'Гривня', icon: 'uah.svg' }
-    ];
-
-    const cryptoOptions = [
-      { code: 'BTC', name: 'Bitcoin', icon: 'bitcoin-btc-logo.svg' },
-      { code: 'ETH', name: 'Ethereum', icon: 'ethereum-eth-logo.svg' },
-      { code: 'USDT', name: 'Tether', icon: 'tether-usdt-logo.svg' },
-      { code: 'BNB', name: 'Binance Coin', icon: 'binance-coin-bnb-logo.svg' },
-      { code: 'SOL', name: 'Solana', icon: 'solana-sol-logo.svg' }
-    ];
-
-    function populateSelect(selectId, options) {
-      const select = document.getElementById(selectId);
-      select.innerHTML = '';
-      options.forEach(opt => {
-        const option = document.createElement('option');
-        option.value = opt.code;
-        option.textContent = `${opt.name} (${opt.code})`;
-        option.dataset.icon = opt.icon;
-        select.appendChild(option);
-      });
-    }
-
-    populateSelect('first-select', fiatOptions);
-    populateSelect('second-select', cryptoOptions);
-
     function updateIcon(selectId, iconId) {
       const select = document.getElementById(selectId);
       const icon = document.getElementById(iconId);
@@ -167,13 +148,10 @@
       const secondIcon = document.getElementById("second-icon");
 
       const tempValue = firstSelect.value;
-      const tempOptions = firstSelect.innerHTML;
-      const tempIcon = firstIcon.src;
+      const tempIcon = firstSelect.options[firstSelect.selectedIndex].dataset.icon;
       const tempLabel = firstLabel.textContent;
 
-      firstSelect.innerHTML = secondSelect.innerHTML;
       firstSelect.value = secondSelect.value;
-      secondSelect.innerHTML = tempOptions;
       secondSelect.value = tempValue;
 
       firstLabel.textContent = secondLabel.textContent;
@@ -185,12 +163,11 @@
 
     async function getRate(from, to) {
       try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from.toLowerCase()}&vs_currencies=${to.toLowerCase()}`);
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`);
         const data = await res.json();
-        return data[from.toLowerCase()][to.toLowerCase()];
-      } catch (e) {
-        console.error('Rate fetch error:', e);
-        return null;
+        return data[from][to];
+      } catch (err) {
+        throw new Error("Не вдалося отримати курс");
       }
     }
 
@@ -201,11 +178,14 @@
 
       if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
-      const rate = await getRate(from, to);
-      if (!rate) return alert("Помилка отримання курсу");
-
-      const result = (amount * rate * 0.98).toFixed(6);
-      document.getElementById("result").innerText = `≈ ${result} ${to}`;
+      try {
+        const rate = await getRate(from, to);
+        if (!rate) throw new Error();
+        const result = (amount * rate * 0.98).toFixed(6);
+        document.getElementById("result").innerText = `≈ ${result} ${to.toUpperCase()}`;
+      } catch (error) {
+        alert("Помилка отримання курсу або курс недоступний для цієї пари.");
+      }
     }
 
     updateIcon("first-select", "first-icon");
