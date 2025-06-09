@@ -31,7 +31,7 @@
       margin-bottom: 20px;
     }
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     label {
       display: block;
@@ -71,7 +71,7 @@
     .swap-btn {
       display: flex;
       justify-content: center;
-      margin: 10px 0;
+      margin: 5px 0 10px;
     }
     .swap-btn button {
       background: transparent;
@@ -103,18 +103,9 @@
       <div class="select-wrapper">
         <img id="first-icon" class="select-icon" src="assets/icons/usd.svg" alt="usd">
         <select id="first-select">
-          <optgroup label="Фіат">
-            <option value="USD" data-icon="usd.svg">USD (Долар)</option>
-            <option value="EUR" data-icon="eur.svg">EUR (Євро)</option>
-            <option value="UAH" data-icon="uah.svg">UAH (Гривня)</option>
-          </optgroup>
-          <optgroup label="Криптовалюта">
-            <option value="BTC" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
-            <option value="ETH" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
-            <option value="USDT" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
-            <option value="BNB" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
-            <option value="SOL" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
-          </optgroup>
+          <option value="USD" data-icon="usd.svg">USD (Долар)</option>
+          <option value="EUR" data-icon="eur.svg">EUR (Євро)</option>
+          <option value="UAH" data-icon="uah.svg">UAH (Гривня)</option>
         </select>
       </div>
     </div>
@@ -126,18 +117,11 @@
       <div class="select-wrapper">
         <img id="second-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
         <select id="second-select">
-          <optgroup label="Фіат">
-            <option value="USD" data-icon="usd.svg">USD (Долар)</option>
-            <option value="EUR" data-icon="eur.svg">EUR (Євро)</option>
-            <option value="UAH" data-icon="uah.svg">UAH (Гривня)</option>
-          </optgroup>
-          <optgroup label="Криптовалюта">
-            <option value="BTC" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
-            <option value="ETH" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
-            <option value="USDT" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
-            <option value="BNB" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
-            <option value="SOL" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
-          </optgroup>
+          <option value="BTC" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
+          <option value="ETH" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
+          <option value="USDT" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
+          <option value="BNB" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
+          <option value="SOL" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
         </select>
       </div>
     </div>
@@ -160,18 +144,19 @@
       const secondSelect = document.getElementById("second-select");
       const firstLabel = document.getElementById("first-label");
       const secondLabel = document.getElementById("second-label");
+      const firstIcon = document.getElementById("first-icon");
+      const secondIcon = document.getElementById("second-icon");
 
-      // Swap selected indexes
-      const tempIndex = firstSelect.selectedIndex;
-      firstSelect.selectedIndex = secondSelect.selectedIndex;
-      secondSelect.selectedIndex = tempIndex;
-
-      // Swap labels
+      const tempValue = firstSelect.value;
+      const tempIcon = firstSelect.options[firstSelect.selectedIndex].dataset.icon;
       const tempLabel = firstLabel.textContent;
+
+      firstSelect.value = secondSelect.value;
+      secondSelect.value = tempValue;
+
       firstLabel.textContent = secondLabel.textContent;
       secondLabel.textContent = tempLabel;
 
-      // Update icons
       updateIcon("first-select", "first-icon");
       updateIcon("second-select", "second-icon");
     }
