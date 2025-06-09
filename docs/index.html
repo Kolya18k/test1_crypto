@@ -47,11 +47,6 @@
       color: white;
       appearance: none;
     }
-    .icon-option {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
     button {
       background: #00c86f;
       color: white;
@@ -98,7 +93,7 @@
       <input type="number" id="amount" placeholder="Введіть суму" />
     </div>
     <div class="form-group" id="first-column">
-      <label id="first-label" for="first-select">Валюта</label>
+      <label id="first-label" for="first-select">Фіат</label>
       <div class="select-wrapper">
         <img id="first-icon" class="select-icon" src="assets/icons/usd.svg" alt="usd">
         <select id="first-select">
@@ -127,35 +122,38 @@
     <button onclick="calculate()">Розрахувати</button>
     <div class="result" id="result"></div>
   </div>
-
   <script>
+    const fiatList = ['usd', 'eur', 'uah'];
+    const cryptoList = ['bitcoin', 'ethereum', 'tether', 'binancecoin', 'solana'];
+
     function updateIcon(selectId, iconId) {
       const select = document.getElementById(selectId);
       const icon = document.getElementById(iconId);
       icon.src = `assets/icons/${select.options[select.selectedIndex].dataset.icon}`;
     }
 
-    document.getElementById("first-select").addEventListener("change", () => updateIcon("first-select", "first-icon"));
-    document.getElementById("second-select").addEventListener("change", () => updateIcon("second-select", "second-icon"));
-
     function swapFields() {
       const firstSelect = document.getElementById("first-select");
       const secondSelect = document.getElementById("second-select");
-      const firstLabel = document.getElementById("first-label");
-      const secondLabel = document.getElementById("second-label");
       const firstIcon = document.getElementById("first-icon");
       const secondIcon = document.getElementById("second-icon");
+      const firstLabel = document.getElementById("first-label");
+      const secondLabel = document.getElementById("second-label");
 
-      // Swap HTML content completely
-      const firstParent = firstSelect.parentNode.parentNode.innerHTML;
-      const secondParent = secondSelect.parentNode.parentNode.innerHTML;
+      // Swap values
+      const tempVal = firstSelect.value;
+      firstSelect.value = secondSelect.value;
+      secondSelect.value = tempVal;
 
-      document.getElementById("first-column").innerHTML = secondParent;
-      document.getElementById("second-column").innerHTML = firstParent;
+      // Swap icons
+      const tempIcon = firstIcon.src;
+      firstIcon.src = secondIcon.src;
+      secondIcon.src = tempIcon;
 
-      // Reapply event listeners
-      document.getElementById("first-select").addEventListener("change", () => updateIcon("first-select", "first-icon"));
-      document.getElementById("second-select").addEventListener("change", () => updateIcon("second-select", "second-icon"));
+      // Swap labels
+      const tempText = firstLabel.innerText;
+      firstLabel.innerText = secondLabel.innerText;
+      secondLabel.innerText = tempText;
 
       updateIcon("first-select", "first-icon");
       updateIcon("second-select", "second-icon");
@@ -163,18 +161,19 @@
 
     async function getRate(from, to) {
       try {
-        // Check which is fiat and which is crypto
-        const fiatList = ['usd', 'eur', 'uah'];
+        const fromIsFiat = fiatList.includes(from);
+        const toIsFiat = fiatList.includes(to);
 
-        let crypto = fiatList.includes(from) ? to : from;
-        let fiat = fiatList.includes(from) ? from : to;
-
-        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${crypto}&vs_currencies=${fiat}`);
-        const data = await res.json();
-        if (data[crypto] && data[crypto][fiat]) {
-          return fiatList.includes(from) ? data[crypto][fiat] : 1 / data[crypto][fiat];
+        if (fromIsFiat && !toIsFiat) {
+          const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${to}&vs_currencies=${from}`);
+          const data = await res.json();
+          return data[to][from];
+        } else if (!fromIsFiat && toIsFiat) {
+          const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`);
+          const data = await res.json();
+          return 1 / data[from][to];
         } else {
-          throw new Error("Не знайдено курс");
+          throw new Error("Можлива лише конверсія між фіатом і криптою");
         }
       } catch (e) {
         throw new Error("Курс не знайдено");
@@ -196,6 +195,9 @@
         alert("Помилка отримання курсу: " + error.message);
       }
     }
+
+    document.getElementById("first-select").addEventListener("change", () => updateIcon("first-select", "first-icon"));
+    document.getElementById("second-select").addEventListener("change", () => updateIcon("second-select", "second-icon"));
 
     updateIcon("first-select", "first-icon");
     updateIcon("second-select", "second-icon");
