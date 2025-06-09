@@ -146,15 +146,16 @@
       const firstIcon = document.getElementById("first-icon");
       const secondIcon = document.getElementById("second-icon");
 
-      const tempValue = firstSelect.value;
-      const tempIcon = firstSelect.options[firstSelect.selectedIndex].dataset.icon;
-      const tempLabel = firstLabel.textContent;
+      // Swap HTML content completely
+      const firstParent = firstSelect.parentNode.parentNode.innerHTML;
+      const secondParent = secondSelect.parentNode.parentNode.innerHTML;
 
-      firstSelect.value = secondSelect.value;
-      secondSelect.value = tempValue;
+      document.getElementById("first-column").innerHTML = secondParent;
+      document.getElementById("second-column").innerHTML = firstParent;
 
-      firstLabel.textContent = secondLabel.textContent;
-      secondLabel.textContent = tempLabel;
+      // Reapply event listeners
+      document.getElementById("first-select").addEventListener("change", () => updateIcon("first-select", "first-icon"));
+      document.getElementById("second-select").addEventListener("change", () => updateIcon("second-select", "second-icon"));
 
       updateIcon("first-select", "first-icon");
       updateIcon("second-select", "second-icon");
@@ -162,10 +163,16 @@
 
     async function getRate(from, to) {
       try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`);
+        // Check which is fiat and which is crypto
+        const fiatList = ['usd', 'eur', 'uah'];
+
+        let crypto = fiatList.includes(from) ? to : from;
+        let fiat = fiatList.includes(from) ? from : to;
+
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${crypto}&vs_currencies=${fiat}`);
         const data = await res.json();
-        if (data[from] && data[from][to]) {
-          return data[from][to];
+        if (data[crypto] && data[crypto][fiat]) {
+          return fiatList.includes(from) ? data[crypto][fiat] : 1 / data[crypto][fiat];
         } else {
           throw new Error("Не знайдено курс");
         }
@@ -195,5 +202,4 @@
   </script>
 </body>
 </html>
-
 
