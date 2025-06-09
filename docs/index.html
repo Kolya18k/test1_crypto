@@ -71,7 +71,7 @@
     .swap-btn {
       display: flex;
       justify-content: center;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     .swap-btn button {
       background: transparent;
@@ -117,7 +117,7 @@
     <div class="swap-btn">
       <button onclick="swapFields()">⇅</button>
     </div>
-    <div class="form-group" id="second-column" style="margin-top: 0;">
+    <div class="form-group" id="second-column">
       <label id="second-label" for="second-select">Криптовалюта</label>
       <div class="select-wrapper">
         <img id="second-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
@@ -152,25 +152,22 @@
       const secondSelect = document.getElementById("second-select");
       const firstLabel = document.getElementById("first-label");
       const secondLabel = document.getElementById("second-label");
-      const firstIcon = document.getElementById("first-icon");
-      const secondIcon = document.getElementById("second-icon");
 
-      // Збереження стану
-      const firstValue = firstSelect.value;
-      const secondValue = secondSelect.value;
-      const firstIconSrc = firstIcon.src;
-      const secondIconSrc = secondIcon.src;
-      const firstLabelText = firstLabel.textContent;
-      const secondLabelText = secondLabel.textContent;
+      // Save current selection indexes
+      const firstSelectedIndex = firstSelect.selectedIndex;
+      const secondSelectedIndex = secondSelect.selectedIndex;
 
-      // Обмін
-      firstSelect.value = secondValue;
-      secondSelect.value = firstValue;
-      firstIcon.src = secondIconSrc;
-      secondIcon.src = firstIconSrc;
-      firstLabel.textContent = secondLabelText;
-      secondLabel.textContent = firstLabelText;
+      // Swap values
+      const tempValue = firstSelect.value;
+      firstSelect.value = secondSelect.value;
+      secondSelect.value = tempValue;
 
+      // Swap labels
+      const tempLabel = firstLabel.textContent;
+      firstLabel.textContent = secondLabel.textContent;
+      secondLabel.textContent = tempLabel;
+
+      // Swap icons
       updateIcon("first-select", "first-icon");
       updateIcon("second-select", "second-icon");
     }
