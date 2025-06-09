@@ -106,6 +106,11 @@
           <option value="usd" data-icon="usd.svg">USD (Долар)</option>
           <option value="eur" data-icon="eur.svg">EUR (Євро)</option>
           <option value="uah" data-icon="uah.svg">UAH (Гривня)</option>
+          <option value="btc" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
+          <option value="eth" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
+          <option value="usdt" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
+          <option value="bnb" data-icon="binance-coin-bnb-logo.svg">BNB (BNB)</option>
+          <option value="sol" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
         </select>
       </div>
     </div>
@@ -117,11 +122,14 @@
       <div class="select-wrapper">
         <img id="second-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
         <select id="second-select">
-          <option value="bitcoin" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
-          <option value="ethereum" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
-          <option value="tether" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
-          <option value="binancecoin" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
-          <option value="solana" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
+          <option value="btc" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
+          <option value="eth" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
+          <option value="usdt" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
+          <option value="bnb" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
+          <option value="sol" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
+          <option value="usd" data-icon="usd.svg">USD (Долар)</option>
+          <option value="eur" data-icon="eur.svg">EUR (Євро)</option>
+          <option value="uah" data-icon="uah.svg">UAH (Гривня)</option>
         </select>
       </div>
     </div>
@@ -148,7 +156,6 @@
       const secondIcon = document.getElementById("second-icon");
 
       const tempValue = firstSelect.value;
-      const tempIcon = firstSelect.options[firstSelect.selectedIndex].dataset.icon;
       const tempLabel = firstLabel.textContent;
 
       firstSelect.value = secondSelect.value;
@@ -165,11 +172,23 @@
       try {
         const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`);
         const data = await res.json();
+        if (!data[from] || !data[from][to]) throw new Error("Курс не знайдено");
         return data[from][to];
-      } catch (err) {
-        throw new Error("Не вдалося отримати курс");
+      } catch {
+        throw new Error("Курс не знайдено");
       }
     }
+
+    const idMap = {
+      usd: 'usd',
+      eur: 'eur',
+      uah: 'uah',
+      btc: 'bitcoin',
+      eth: 'ethereum',
+      usdt: 'tether',
+      bnb: 'binancecoin',
+      sol: 'solana'
+    };
 
     async function calculate() {
       const amount = parseFloat(document.getElementById('amount').value);
@@ -179,12 +198,11 @@
       if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
       try {
-        const rate = await getRate(from, to);
-        if (!rate) throw new Error();
+        const rate = await getRate(idMap[from], idMap[to]);
         const result = (amount * rate * 0.98).toFixed(6);
         document.getElementById("result").innerText = `≈ ${result} ${to.toUpperCase()}`;
-      } catch (error) {
-        alert("Помилка отримання курсу або курс недоступний для цієї пари.");
+      } catch (e) {
+        document.getElementById("result").innerText = e.message;
       }
     }
 
@@ -193,3 +211,4 @@
   </script>
 </body>
 </html>
+
