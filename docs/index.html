@@ -31,7 +31,11 @@
       margin-bottom: 20px;
     }
     .form-group {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+    }
+    #second-column {
+      margin-top: -10px;
+      margin-bottom: 25px;
     }
     label {
       display: block;
@@ -71,7 +75,7 @@
     .swap-btn {
       display: flex;
       justify-content: center;
-      margin: 15px 0 10px;
+      margin-bottom: 15px;
     }
     .swap-btn button {
       background: transparent;
@@ -137,37 +141,38 @@
     const firstColumn = document.getElementById("first-column");
     const secondColumn = document.getElementById("second-column");
 
-    function updateIcons() {
-      const fiatEl = document.getElementById("fiat");
-      const cryptoEl = document.getElementById("crypto");
-      document.getElementById("fiat-icon").src = `assets/icons/${fiatEl.options[fiatEl.selectedIndex].dataset.icon}`;
-      document.getElementById("crypto-icon").src = `assets/icons/${cryptoEl.options[cryptoEl.selectedIndex].dataset.icon}`;
-    }
+    fiatSelect.addEventListener("change", () => {
+      fiatIcon.src = `assets/icons/${fiatSelect.options[fiatSelect.selectedIndex].dataset.icon}`;
+    });
 
-    fiatSelect.addEventListener("change", updateIcons);
-    cryptoSelect.addEventListener("change", updateIcons);
+    cryptoSelect.addEventListener("change", () => {
+      cryptoIcon.src = `assets/icons/${cryptoSelect.options[cryptoSelect.selectedIndex].dataset.icon}`;
+    });
 
     let isFiatFirst = true;
 
     function swapFields() {
       isFiatFirst = !isFiatFirst;
-      const tempHTML = firstColumn.innerHTML;
-      firstColumn.innerHTML = secondColumn.innerHTML;
-      secondColumn.innerHTML = tempHTML;
-      updateIcons();
+      const first = firstColumn.innerHTML;
+      const second = secondColumn.innerHTML;
+      firstColumn.innerHTML = second;
+      secondColumn.innerHTML = first;
+
+      // Оновити посилання на елементи та додати події
+      setTimeout(() => {
+        document.getElementById("fiat").addEventListener("change", () => {
+          document.getElementById("fiat-icon").src = `assets/icons/${document.getElementById("fiat").options[document.getElementById("fiat").selectedIndex].dataset.icon}`;
+        });
+        document.getElementById("crypto").addEventListener("change", () => {
+          document.getElementById("crypto-icon").src = `assets/icons/${document.getElementById("crypto").options[document.getElementById("crypto").selectedIndex].dataset.icon}`;
+        });
+      }, 50);
     }
 
     async function getRate(from, to) {
-      const url = `https://api.kraken.com/0/public/Ticker?pair=${from}${to}`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const pairKey = Object.keys(data.result)[0];
-        return parseFloat(data.result[pairKey].c[0]);
-      } catch (e) {
-        alert("Помилка отримання курсу з Kraken");
-        return 0;
-      }
+      const res = await fetch(`https://min-api.cryptocompare.com/data/price?fsym=${from}&tsyms=${to}`);
+      const data = await res.json();
+      return data[to];
     }
 
     async function calculate() {
@@ -178,8 +183,6 @@
       if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
       const rate = await getRate(from, to);
-      if (!rate) return;
-
       const result = isFiatFirst
         ? (amount / rate * 0.98).toFixed(6)
         : (amount * rate * 0.98).toFixed(2);
