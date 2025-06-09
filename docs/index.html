@@ -71,7 +71,7 @@
     .swap-btn {
       display: flex;
       justify-content: center;
-      margin: 5px 0 10px;
+      margin: 10px 0;
     }
     .swap-btn button {
       background: transparent;
@@ -147,18 +147,22 @@
       const firstIcon = document.getElementById("first-icon");
       const secondIcon = document.getElementById("second-icon");
 
+      // Swap values
       const tempValue = firstSelect.value;
-      const tempIcon = firstSelect.options[firstSelect.selectedIndex].dataset.icon;
-      const tempLabel = firstLabel.textContent;
+      const tempIconSrc = firstIcon.src;
+      const tempLabelText = firstLabel.textContent;
 
       firstSelect.value = secondSelect.value;
       secondSelect.value = tempValue;
 
-      firstLabel.textContent = secondLabel.textContent;
-      secondLabel.textContent = tempLabel;
-
       updateIcon("first-select", "first-icon");
       updateIcon("second-select", "second-icon");
+
+      const currentFirstLabel = firstLabel.textContent;
+      const currentSecondLabel = secondLabel.textContent;
+
+      firstLabel.textContent = currentSecondLabel;
+      secondLabel.textContent = currentFirstLabel;
     }
 
     async function getRate(from, to) {
@@ -188,4 +192,3 @@
   </script>
 </body>
 </html>
-
