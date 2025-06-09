@@ -149,8 +149,21 @@
     function updateLabels() {
       const firstSelect = document.getElementById('first-select');
       const secondSelect = document.getElementById('second-select');
-      document.getElementById('first-label').innerText = fiatOptions.some(opt => opt.value === firstSelect.value) ? 'Фіат' : 'Криптовалюта';
-      document.getElementById('second-label').innerText = fiatOptions.some(opt => opt.value === secondSelect.value) ? 'Фіат' : 'Криптовалюта';
+      const firstLabel = document.getElementById('first-label');
+      const secondLabel = document.getElementById('second-label');
+
+      if (fiatOptions.some(opt => opt.value === firstSelect.value)) {
+        firstLabel.innerText = 'Фіат';
+        populateSelect('first-select', fiatOptions);
+        populateSelect('second-select', cryptoOptions);
+      } else {
+        firstLabel.innerText = 'Криптовалюта';
+        populateSelect('first-select', cryptoOptions);
+        populateSelect('second-select', fiatOptions);
+      }
+
+      updateIcon('first-select', 'first-icon');
+      updateIcon('second-select', 'second-icon');
     }
 
     function swapFields() {
@@ -158,14 +171,10 @@
       const secondSelect = document.getElementById("second-select");
 
       const tempVal = firstSelect.value;
-      const tempIcon = firstSelect.options[firstSelect.selectedIndex].dataset.icon;
-      const tempSymbol = firstSelect.options[firstSelect.selectedIndex].dataset.symbol;
 
       firstSelect.value = secondSelect.value;
       secondSelect.value = tempVal;
 
-      updateIcon("first-select", "first-icon");
-      updateIcon("second-select", "second-icon");
       updateLabels();
     }
 
@@ -177,11 +186,11 @@
       if (fromIsFiat && !toIsFiat) {
         const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${to}&vs_currencies=${from}`);
         const data = await res.json();
-        return data[to][from];
+        return 1 / data[to][from];
       } else if (!fromIsFiat && toIsFiat) {
         const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from}&vs_currencies=${to}`);
         const data = await res.json();
-        return 1 / data[from][to];
+        return data[from][to];
       } else {
         throw new Error("Можлива лише конверсія між фіатом і криптою");
       }
@@ -222,5 +231,6 @@
   </script>
 </body>
 </html>
+
 
 
