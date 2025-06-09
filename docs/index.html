@@ -31,7 +31,7 @@
       margin-bottom: 20px;
     }
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     label {
       display: block;
@@ -71,7 +71,7 @@
     .swap-btn {
       display: flex;
       justify-content: center;
-      margin: -10px 0 10px;
+      margin-bottom: 15px;
     }
     .swap-btn button {
       background: transparent;
@@ -99,20 +99,30 @@
       <input type="number" id="amount" placeholder="Введіть суму" />
     </div>
     <div class="form-group" id="first-column">
-      <label for="currency-one">Валюта</label>
+      <label id="first-label" for="fiat">Валюта</label>
       <div class="select-wrapper">
-        <img id="icon-one" class="select-icon" src="assets/icons/usd.svg" alt="usd">
-        <select id="currency-one"></select>
+        <img id="fiat-icon" class="select-icon" src="assets/icons/usd.svg" alt="usd">
+        <select id="fiat">
+          <option value="USD" data-icon="usd.svg">USD (Долар)</option>
+          <option value="EUR" data-icon="eur.svg">EUR (Євро)</option>
+          <option value="UAH" data-icon="uah.svg">UAH (Гривня)</option>
+        </select>
       </div>
     </div>
     <div class="swap-btn">
       <button onclick="swapFields()">⇅</button>
     </div>
-    <div class="form-group" id="second-column">
-      <label for="currency-two">Криптовалюта</label>
+    <div class="form-group" id="second-column" style="margin-top: -5px;">
+      <label id="second-label" for="crypto">Криптовалюта</label>
       <div class="select-wrapper">
-        <img id="icon-two" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
-        <select id="currency-two"></select>
+        <img id="crypto-icon" class="select-icon" src="assets/icons/bitcoin-btc-logo.svg" alt="btc">
+        <select id="crypto">
+          <option value="BTC" data-icon="bitcoin-btc-logo.svg">Bitcoin (BTC)</option>
+          <option value="ETH" data-icon="ethereum-eth-logo.svg">Ethereum (ETH)</option>
+          <option value="USDT" data-icon="tether-usdt-logo.svg">Tether (USDT)</option>
+          <option value="BNB" data-icon="binance-coin-bnb-logo.svg">Binance Coin (BNB)</option>
+          <option value="SOL" data-icon="solana-sol-logo.svg">Solana (SOL)</option>
+        </select>
       </div>
     </div>
     <button onclick="calculate()">Розрахувати</button>
@@ -120,76 +130,67 @@
   </div>
 
   <script>
-    const currencies = [
-      { code: 'USD', name: 'Долар США', icon: 'usd.svg', isFiat: true },
-      { code: 'EUR', name: 'Євро', icon: 'eur.svg', isFiat: true },
-      { code: 'UAH', name: 'Гривня', icon: 'uah.svg', isFiat: true },
-      { code: 'BTC', name: 'Bitcoin', icon: 'bitcoin-btc-logo.svg', isFiat: false },
-      { code: 'ETH', name: 'Ethereum', icon: 'ethereum-eth-logo.svg', isFiat: false },
-      { code: 'USDT', name: 'Tether', icon: 'tether-usdt-logo.svg', isFiat: false },
-      { code: 'BNB', name: 'Binance Coin', icon: 'binance-coin-bnb-logo.svg', isFiat: false },
-      { code: 'SOL', name: 'Solana', icon: 'solana-sol-logo.svg', isFiat: false }
-    ];
-
-    const currencyOne = document.getElementById('currency-one');
-    const currencyTwo = document.getElementById('currency-two');
-    const iconOne = document.getElementById('icon-one');
-    const iconTwo = document.getElementById('icon-two');
     let isFiatFirst = true;
 
-    function populateSelects() {
-      currencyOne.innerHTML = '';
-      currencyTwo.innerHTML = '';
-      currencies.forEach(cur => {
-        const option = `<option value="${cur.code}" data-icon="${cur.icon}" data-name="${cur.name}">${cur.name}</option>`;
-        currencyOne.innerHTML += option;
-        currencyTwo.innerHTML += option;
-      });
-      currencyOne.value = 'USD';
-      currencyTwo.value = 'BTC';
-    }
-
     function updateIcons() {
-      const selectedOne = currencies.find(c => c.code === currencyOne.value);
-      const selectedTwo = currencies.find(c => c.code === currencyTwo.value);
-      iconOne.src = `assets/icons/${selectedOne.icon}`;
-      iconTwo.src = `assets/icons/${selectedTwo.icon}`;
+      const fiatSelect = document.getElementById("fiat");
+      const cryptoSelect = document.getElementById("crypto");
+      const fiatIcon = document.getElementById("fiat-icon");
+      const cryptoIcon = document.getElementById("crypto-icon");
+
+      if (fiatSelect && fiatIcon) {
+        fiatIcon.src = `assets/icons/${fiatSelect.options[fiatSelect.selectedIndex].dataset.icon}`;
+      }
+      if (cryptoSelect && cryptoIcon) {
+        cryptoIcon.src = `assets/icons/${cryptoSelect.options[cryptoSelect.selectedIndex].dataset.icon}`;
+      }
     }
 
-    currencyOne.addEventListener('change', updateIcons);
-    currencyTwo.addEventListener('change', updateIcons);
+    document.getElementById("fiat").addEventListener("change", updateIcons);
+    document.getElementById("crypto").addEventListener("change", updateIcons);
 
     function swapFields() {
-      [currencyOne.value, currencyTwo.value] = [currencyTwo.value, currencyOne.value];
+      isFiatFirst = !isFiatFirst;
+
+      const firstLabel = document.getElementById("first-label");
+      const secondLabel = document.getElementById("second-label");
+      const first = document.getElementById("first-column").innerHTML;
+      const second = document.getElementById("second-column").innerHTML;
+
+      document.getElementById("first-column").innerHTML = second;
+      document.getElementById("second-column").innerHTML = first;
+
+      // Swap labels as well
+      const tempLabel = firstLabel.textContent;
+      firstLabel.textContent = secondLabel.textContent;
+      secondLabel.textContent = tempLabel;
+
+      document.getElementById("fiat")?.addEventListener("change", updateIcons);
+      document.getElementById("crypto")?.addEventListener("change", updateIcons);
       updateIcons();
     }
 
     async function getRate(from, to) {
-      try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from.toLowerCase()}&vs_currencies=${to.toLowerCase()}`);
-        const data = await res.json();
-        return data[from.toLowerCase()][to.toLowerCase()];
-      } catch {
-        alert("Помилка отримання курсу. Спробуйте пізніше.");
-        return null;
-      }
+      const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${from.toLowerCase()}&vs_currencies=${to.toLowerCase()}`);
+      const data = await res.json();
+      return data[from.toLowerCase()][to.toLowerCase()];
     }
 
     async function calculate() {
       const amount = parseFloat(document.getElementById('amount').value);
-      const from = currencyOne.value;
-      const to = currencyTwo.value;
+      const from = isFiatFirst ? document.getElementById("fiat").value : document.getElementById("crypto").value;
+      const to = isFiatFirst ? document.getElementById("crypto").value : document.getElementById("fiat").value;
 
       if (!amount || amount <= 0) return alert("Введіть коректну суму");
 
       const rate = await getRate(from, to);
-      if (!rate) return;
+      const result = isFiatFirst
+        ? (amount / rate * 0.98).toFixed(6)
+        : (amount * rate * 0.98).toFixed(2);
 
-      const result = (amount * rate * 0.98).toFixed(6);
       document.getElementById("result").innerText = `≈ ${result} ${to}`;
     }
 
-    populateSelects();
     updateIcons();
   </script>
 </body>
