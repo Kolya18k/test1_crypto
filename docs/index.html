@@ -127,7 +127,9 @@
       { value: 'solana', text: 'Solana (SOL)', icon: 'solana-sol-logo.svg', symbol: 'SOL' }
     ];
 
-    function populateSelect(selectId, options) {
+    let isFiatToCrypto = true;
+
+    function populateSelect(selectId, options, selectedValue = null) {
       const select = document.getElementById(selectId);
       select.innerHTML = '';
       options.forEach(option => {
@@ -136,46 +138,55 @@
         opt.text = option.text;
         opt.dataset.icon = option.icon;
         opt.dataset.symbol = option.symbol;
+        if (selectedValue === option.value) {
+          opt.selected = true;
+        }
         select.appendChild(opt);
       });
     }
 
-    function updateIcon(selectId, iconId) {
-      const select = document.getElementById(selectId);
-      const icon = document.getElementById(iconId);
-      icon.src = `assets/icons/${select.options[select.selectedIndex].dataset.icon}`;
-    }
-
-    function updateLabels() {
+    function updateIconsAndLabels() {
       const firstSelect = document.getElementById('first-select');
       const secondSelect = document.getElementById('second-select');
+      const firstIcon = document.getElementById('first-icon');
+      const secondIcon = document.getElementById('second-icon');
       const firstLabel = document.getElementById('first-label');
       const secondLabel = document.getElementById('second-label');
 
-      if (fiatOptions.some(opt => opt.value === firstSelect.value)) {
+      const fiatList = fiatOptions.map(opt => opt.value);
+
+      if (fiatList.includes(firstSelect.value)) {
         firstLabel.innerText = 'Фіат';
-        populateSelect('first-select', fiatOptions);
-        populateSelect('second-select', cryptoOptions);
+        secondLabel.innerText = 'Криптовалюта';
+        isFiatToCrypto = true;
       } else {
         firstLabel.innerText = 'Криптовалюта';
-        populateSelect('first-select', cryptoOptions);
-        populateSelect('second-select', fiatOptions);
+        secondLabel.innerText = 'Фіат';
+        isFiatToCrypto = false;
       }
 
-      updateIcon('first-select', 'first-icon');
-      updateIcon('second-select', 'second-icon');
+      const firstOption = firstSelect.selectedOptions[0];
+      const secondOption = secondSelect.selectedOptions[0];
+
+      firstIcon.src = `assets/icons/${firstOption.dataset.icon}`;
+      secondIcon.src = `assets/icons/${secondOption.dataset.icon}`;
     }
 
     function swapFields() {
-      const firstSelect = document.getElementById("first-select");
-      const secondSelect = document.getElementById("second-select");
+      const firstSelect = document.getElementById('first-select');
+      const secondSelect = document.getElementById('second-select');
+      const tempValue = firstSelect.value;
+      const tempIcon = firstSelect.options[firstSelect.selectedIndex].dataset.icon;
+      const tempSymbol = firstSelect.options[firstSelect.selectedIndex].dataset.symbol;
 
-      const tempVal = firstSelect.value;
+      const secondValue = secondSelect.value;
+      const secondIcon = secondSelect.options[secondSelect.selectedIndex].dataset.icon;
+      const secondSymbol = secondSelect.options[secondSelect.selectedIndex].dataset.symbol;
 
-      firstSelect.value = secondSelect.value;
-      secondSelect.value = tempVal;
+      populateSelect('first-select', fiatOptions.concat(cryptoOptions), secondValue);
+      populateSelect('second-select', fiatOptions.concat(cryptoOptions), tempValue);
 
-      updateLabels();
+      updateIconsAndLabels();
     }
 
     async function getRate(from, to) {
@@ -217,20 +228,15 @@
     populateSelect("second-select", cryptoOptions);
 
     document.getElementById("first-select").addEventListener("change", () => {
-      updateIcon("first-select", "first-icon");
-      updateLabels();
+      updateIconsAndLabels();
     });
     document.getElementById("second-select").addEventListener("change", () => {
-      updateIcon("second-select", "second-icon");
-      updateLabels();
+      updateIconsAndLabels();
     });
 
-    updateIcon("first-select", "first-icon");
-    updateIcon("second-select", "second-icon");
-    updateLabels();
+    updateIconsAndLabels();
   </script>
 </body>
 </html>
-
 
 
