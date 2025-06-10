@@ -160,37 +160,27 @@
       const firstLabel = document.getElementById('first-label');
       const secondLabel = document.getElementById('second-label');
 
-      const fiatList = fiatOptions.map(opt => opt.value);
-
-      if (fiatList.includes(firstSelect.value)) {
-        firstLabel.innerText = 'Фіат';
-        secondLabel.innerText = 'Криптовалюта';
-        isFiatToCrypto = true;
-        populateSelect('first-select', fiatOptions, firstSelect.value);
-        populateSelect('second-select', cryptoOptions, secondSelect.value);
-      } else {
-        firstLabel.innerText = 'Криптовалюта';
-        secondLabel.innerText = 'Фіат';
-        isFiatToCrypto = false;
-        populateSelect('first-select', cryptoOptions, firstSelect.value);
-        populateSelect('second-select', fiatOptions, secondSelect.value);
-      }
-
       const firstOption = firstSelect.selectedOptions[0];
       const secondOption = secondSelect.selectedOptions[0];
 
       firstIcon.src = `assets/icons/${firstOption.dataset.icon}`;
       secondIcon.src = `assets/icons/${secondOption.dataset.icon}`;
+
+      firstLabel.innerText = isFiatToCrypto ? 'Фіат' : 'Криптовалюта';
+      secondLabel.innerText = isFiatToCrypto ? 'Криптовалюта' : 'Фіат';
     }
 
     function swapFields() {
+      isFiatToCrypto = !isFiatToCrypto;
+
       const firstSelect = document.getElementById('first-select');
       const secondSelect = document.getElementById('second-select');
-      const tempValue = firstSelect.value;
+
+      const firstValue = firstSelect.value;
       const secondValue = secondSelect.value;
 
-      firstSelect.value = secondValue;
-      secondSelect.value = tempValue;
+      populateSelect('first-select', isFiatToCrypto ? fiatOptions : cryptoOptions, secondValue);
+      populateSelect('second-select', isFiatToCrypto ? cryptoOptions : fiatOptions, firstValue);
 
       updateIconsAndLabels();
       calculate();
