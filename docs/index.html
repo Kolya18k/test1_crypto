@@ -159,10 +159,14 @@
         firstLabel.innerText = 'Фіат';
         secondLabel.innerText = 'Криптовалюта';
         isFiatToCrypto = true;
+        populateSelect('first-select', fiatOptions, firstSelect.value);
+        populateSelect('second-select', cryptoOptions, secondSelect.value);
       } else {
         firstLabel.innerText = 'Криптовалюта';
         secondLabel.innerText = 'Фіат';
         isFiatToCrypto = false;
+        populateSelect('first-select', cryptoOptions, firstSelect.value);
+        populateSelect('second-select', fiatOptions, secondSelect.value);
       }
 
       const firstOption = firstSelect.selectedOptions[0];
@@ -178,11 +182,11 @@
       const tempValue = firstSelect.value;
       const secondValue = secondSelect.value;
 
-      populateSelect('first-select', fiatOptions.concat(cryptoOptions), secondValue);
-      populateSelect('second-select', fiatOptions.concat(cryptoOptions), tempValue);
+      firstSelect.value = secondValue;
+      secondSelect.value = tempValue;
 
       updateIconsAndLabels();
-      calculate();
+      document.getElementById("result").innerText = '';
     }
 
     async function getRate(from, to) {
@@ -211,7 +215,10 @@
       const to = document.getElementById("second-select").value;
       const toSymbol = document.getElementById("second-select").selectedOptions[0].dataset.symbol;
 
-      if (!amount || amount <= 0) return alert("Введіть коректну суму");
+      if (isNaN(amount) || amount <= 0) {
+        document.getElementById("result").innerText = '';
+        return;
+      }
 
       try {
         const rate = await getRate(from, to);
