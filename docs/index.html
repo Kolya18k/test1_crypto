@@ -193,7 +193,7 @@
       secondSelect.value = tempValue;
 
       updateIconsAndLabels();
-      document.getElementById("result").innerText = '';
+      calculate();
     }
 
     async function getRate(from, to) {
@@ -241,9 +241,11 @@
 
     document.getElementById("first-select").addEventListener("change", () => {
       updateIconsAndLabels();
+      calculate();
     });
     document.getElementById("second-select").addEventListener("change", () => {
       updateIconsAndLabels();
+      calculate();
     });
 
     updateIconsAndLabels();
