@@ -183,7 +183,6 @@
       populateSelect('second-select', isFiatToCrypto ? cryptoOptions : fiatOptions, firstValue);
 
       updateIconsAndLabels();
-      calculate();
     }
 
     async function getRate(from, to) {
@@ -229,14 +228,8 @@
     populateSelect("first-select", fiatOptions);
     populateSelect("second-select", cryptoOptions);
 
-    document.getElementById("first-select").addEventListener("change", () => {
-      updateIconsAndLabels();
-      calculate();
-    });
-    document.getElementById("second-select").addEventListener("change", () => {
-      updateIconsAndLabels();
-      calculate();
-    });
+    document.getElementById("first-select").addEventListener("change", updateIconsAndLabels);
+    document.getElementById("second-select").addEventListener("change", updateIconsAndLabels);
 
     updateIconsAndLabels();
   </script>
