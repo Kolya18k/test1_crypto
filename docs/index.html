@@ -176,17 +176,13 @@
       const firstSelect = document.getElementById('first-select');
       const secondSelect = document.getElementById('second-select');
       const tempValue = firstSelect.value;
-      const tempIcon = firstSelect.options[firstSelect.selectedIndex].dataset.icon;
-      const tempSymbol = firstSelect.options[firstSelect.selectedIndex].dataset.symbol;
-
       const secondValue = secondSelect.value;
-      const secondIcon = secondSelect.options[secondSelect.selectedIndex].dataset.icon;
-      const secondSymbol = secondSelect.options[secondSelect.selectedIndex].dataset.symbol;
 
       populateSelect('first-select', fiatOptions.concat(cryptoOptions), secondValue);
       populateSelect('second-select', fiatOptions.concat(cryptoOptions), tempValue);
 
       updateIconsAndLabels();
+      calculate();
     }
 
     async function getRate(from, to) {
@@ -229,9 +225,11 @@
 
     document.getElementById("first-select").addEventListener("change", () => {
       updateIconsAndLabels();
+      calculate();
     });
     document.getElementById("second-select").addEventListener("change", () => {
       updateIconsAndLabels();
+      calculate();
     });
 
     updateIconsAndLabels();
